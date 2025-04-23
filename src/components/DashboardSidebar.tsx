@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { 
   Sidebar, 
@@ -17,7 +16,7 @@ import {
   Flag, 
   Currency, 
   Newspaper, 
-  Airplane,
+  Plane,
   Sun
 } from 'lucide-react';
 
@@ -35,7 +34,7 @@ const DashboardSidebar = ({ activeModule, onModuleChange }: DashboardSidebarProp
     { id: 'country', name: 'Countries', icon: Flag },
     { id: 'currency', name: 'Currency', icon: Currency },
     { id: 'news', name: 'News', icon: Newspaper },
-    { id: 'flight', name: 'Flights', icon: Airplane },
+    { id: 'flight', name: 'Flights', icon: Plane },
   ];
 
   return (
@@ -43,7 +42,7 @@ const DashboardSidebar = ({ activeModule, onModuleChange }: DashboardSidebarProp
       <SidebarHeader className="p-4">
         <h2 className="text-xl font-bold flex items-center gap-2">
           <span className="text-[hsl(var(--sidebar-primary))]">
-            <Airplane className="h-6 w-6" />
+            <Plane className="h-6 w-6" />
           </span>
           <span>Wanderlust</span>
         </h2>

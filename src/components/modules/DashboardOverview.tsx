@@ -1,6 +1,5 @@
-
 import ModuleCard from '../ModuleCard';
-import { Cloud, Flag, Currency, Newspaper, Airplane } from 'lucide-react';
+import { Cloud, Flag, Currency, Newspaper, Plane } from 'lucide-react';
 
 const DashboardOverview = () => {
   const modules = [
@@ -41,7 +40,7 @@ const DashboardOverview = () => {
       title: 'Flight Search',
       type: 'flight',
       description: 'Find and save flight options for your upcoming trips.',
-      icon: Airplane,
+      icon: Plane,
       count: 3
     }
   ];

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import ModuleCard from '../ModuleCard';
 import { Input } from '@/components/ui/input';
@@ -7,7 +6,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Calendar as CalendarIcon, Airplane } from 'lucide-react';
+import { Calendar as CalendarIcon, Plane } from 'lucide-react';
 
 interface FlightSearch {
   id: string;
@@ -174,7 +173,7 @@ const FlightModule = () => {
                   {flight.price}
                 </div>
                 <div className="flex items-center gap-1">
-                  <Airplane className="h-5 w-5 text-[hsl(var(--flight-color))]" />
+                  <Plane className="h-5 w-5 text-[hsl(var(--flight-color))]" />
                   <span className="font-medium">{flight.airline}</span>
                 </div>
               </div>
