@@ -3,20 +3,20 @@
 export async function loadTemplates() {
   try {
     // Load all template HTML files
-    const dashboardTemplate = await fetchTemplate('dashboard');
-    const weatherTemplate = await fetchTemplate('weather');
-    const countryTemplate = await fetchTemplate('country');
-    const currencyTemplate = await fetchTemplate('currency');
-    const newsTemplate = await fetchTemplate('news');
-    const flightTemplate = await fetchTemplate('flight');
+    const dashboardTemplate = await fetchTemplate('dashboard/template');
+    const weatherTemplate = await fetchTemplate('weather/template');
+    const countryTemplate = await fetchTemplate('country/template');
+    const currencyTemplate = await fetchTemplate('currency/template');
+    const newsTemplate = await fetchTemplate('news/template');
+    const flightTemplate = await fetchTemplate('flight/template');
     
     // Load all card templates
-    const weatherCardTemplate = await fetchTemplate('cards/weather-card');
-    const countryCardTemplate = await fetchTemplate('cards/country-card');
-    const currencyCardTemplate = await fetchTemplate('cards/currency-card');
-    const newsCardTemplate = await fetchTemplate('cards/news-card');
-    const flightCardTemplate = await fetchTemplate('cards/flight-card');
-    const moduleCardTemplate = await fetchTemplate('cards/module-card');
+    const weatherCardTemplate = await fetchTemplate('weather/cards/weather-card');
+    const countryCardTemplate = await fetchTemplate('country/cards/country-card');
+    const currencyCardTemplate = await fetchTemplate('currency/cards/currency-card');
+    const newsCardTemplate = await fetchTemplate('news/cards/news-card');
+    const flightCardTemplate = await fetchTemplate('flight/cards/flight-card');
+    const moduleCardTemplate = await fetchTemplate('dashboard/cards/module-card');
     
     // Create template elements and add to body (hidden)
     createTemplateElement('dashboard-template', dashboardTemplate);
@@ -41,7 +41,7 @@ export async function loadTemplates() {
 
 // Fetch a template file
 async function fetchTemplate(name) {
-  const response = await fetch(`templates/${name}.html`);
+  const response = await fetch(`modules/${name}.html`);
   if (!response.ok) {
     throw new Error(`Failed to load template: ${name}`);
   }

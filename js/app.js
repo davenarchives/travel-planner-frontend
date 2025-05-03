@@ -1,11 +1,11 @@
 
 // Import module handlers
-import { dashboardModule } from './modules/dashboard.js';
-import { weatherModule } from './modules/weather.js';
-import { countryModule } from './modules/country.js';
-import { currencyModule } from './modules/currency.js';
-import { newsModule } from './modules/news.js';
-import { flightModule } from './modules/flight.js';
+import { dashboardModule } from './modules/dashboard/dashboard.js';
+import { weatherModule } from './modules/weather/weather.js';
+import { countryModule } from './modules/country/country.js';
+import { currencyModule } from './modules/currency/currency.js';
+import { newsModule } from './modules/news/news.js';
+import { flightModule } from './modules/flight/flight.js';
 
 // Import UI templates
 import { loadTemplates } from './templates.js';
