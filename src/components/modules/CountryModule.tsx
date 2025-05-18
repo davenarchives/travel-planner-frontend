@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModuleCard from '../ModuleCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,11 @@ interface Country {
   tags: string[];
 }
 
-const CountryModule = () => {
+interface CountryModuleProps {
+  countryFilter?: string;
+}
+
+const CountryModule = ({ countryFilter }: CountryModuleProps) => {
   const [countries, setCountries] = useState<Country[]>([
     {
       id: '1',
@@ -48,6 +52,35 @@ const CountryModule = () => {
   ]);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [displayedCountries, setDisplayedCountries] = useState<Country[]>([]);
+
+  // Filter countries based on countryFilter prop or user search
+  useEffect(() => {
+    if (countryFilter) {
+      const filtered = countries.filter(country => 
+        country.name.toLowerCase().includes(countryFilter.toLowerCase())
+      );
+      
+      // If no matches found and this is a search request, add the search term as a new country
+      if (filtered.length === 0) {
+        const newCountry: Country = {
+          id: Date.now().toString(),
+          name: countryFilter,
+          capital: 'Sample Capital',
+          population: 'Unknown',
+          region: 'Unknown',
+          flag: '🏳️',
+          tags: ['New']
+        };
+        setCountries(prev => [...prev, newCountry]);
+        setDisplayedCountries([newCountry]);
+      } else {
+        setDisplayedCountries(filtered);
+      }
+    } else {
+      setDisplayedCountries(countries);
+    }
+  }, [countryFilter, countries]);
 
   const handleAddCountry = () => {
     if (searchTerm.trim() !== '') {
@@ -73,21 +106,23 @@ const CountryModule = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <Input 
-          placeholder="Search for a country..." 
-          value={searchTerm} 
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleAddCountry()}
-          className="flex-1"
-        />
-        <Button onClick={handleAddCountry} className="bg-[hsl(var(--country-color))]">
-          Add Country
-        </Button>
-      </div>
+      {!countryFilter && (
+        <div className="flex gap-2">
+          <Input 
+            placeholder="Search for a country..." 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleAddCountry()}
+            className="flex-1"
+          />
+          <Button onClick={handleAddCountry} className="bg-[hsl(var(--country-color))]">
+            Add Country
+          </Button>
+        </div>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {countries.map((country) => (
+        {displayedCountries.map((country) => (
           <ModuleCard 
             key={country.id}
             title={`${country.flag} ${country.name}`}

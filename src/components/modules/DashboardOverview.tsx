@@ -1,7 +1,12 @@
+
 import ModuleCard from '../ModuleCard';
 import { Cloud, Flag, Currency, Newspaper, Plane } from 'lucide-react';
 
-const DashboardOverview = () => {
+interface DashboardOverviewProps {
+  onModuleSelect?: (module: string) => void;
+}
+
+const DashboardOverview = ({ onModuleSelect }: DashboardOverviewProps) => {
   const modules = [
     {
       id: 'weather',
@@ -45,9 +50,15 @@ const DashboardOverview = () => {
     }
   ];
 
+  const handleModuleClick = (moduleId: string) => {
+    if (onModuleSelect) {
+      onModuleSelect(moduleId);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-lg p-6 shadow-lg">
+      <div className="bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg p-6 shadow-lg">
         <h1 className="text-3xl font-bold mb-2">Wanderlust Compass Dashboard</h1>
         <p className="opacity-90">Your complete travel planning companion with CRUD functionality</p>
         <p className="text-sm opacity-80 mt-4">Each module connects to external APIs while providing full create, read, update, and delete capabilities.</p>
@@ -62,7 +73,7 @@ const DashboardOverview = () => {
               key={module.id}
               title={module.title}
               type={module.type as any}
-              onView={() => console.log(`Navigate to ${module.id} module`)}
+              onView={() => handleModuleClick(module.id)}
             >
               <div className="flex flex-col items-center text-center p-2">
                 <ModuleIcon className="h-12 w-12 mb-3 text-[hsl(var(--${module.type}-color))]" />
