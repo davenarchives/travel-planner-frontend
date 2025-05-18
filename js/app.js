@@ -1,5 +1,4 @@
 
-
 // Import module handlers
 import { dashboardModule } from './modules/dashboard.js';
 import { weatherModule } from './modules/weather.js';
@@ -136,4 +135,3 @@ function getCurrentModule() {
 
 // Export for other modules
 export { loadModule };
-
