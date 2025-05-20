@@ -45,80 +45,83 @@ export const currencyAPI = {
   countryCurrencies: {
     'United States': 'USD',
     'Japan': 'JPY',
-    'Italy': 'EUR',
-    'France': 'EUR',
+    'EU': 'EUR',
     'UK': 'GBP',
-    'Australia': 'AUD',
     'Canada': 'CAD',
+    'Australia': 'AUD',
     'China': 'CNY',
-    'India': 'INR',
-    'UAE': 'AED'
+    'India': 'INR'
   },
   
   // Get exchange rate between two currencies
   async getExchangeRate(fromCurrency, toCurrency) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
+        // Check if we have the rate in our mock data
         if (this.mockExchangeRates[fromCurrency] && this.mockExchangeRates[fromCurrency][toCurrency]) {
           resolve(this.mockExchangeRates[fromCurrency][toCurrency]);
+        } else if (fromCurrency === toCurrency) {
+          resolve(1.0);
         } else {
-          // Generate random rate for unknown pairs
-          const rate = parseFloat((Math.random() * (1.5 - 0.5) + 0.5).toFixed(4));
-          resolve(rate);
+          // Generate a random exchange rate if not found
+          const baseRate = Math.random() * 2;
+          resolve(baseRate);
         }
       }, 300);
     });
   },
   
-  // Get currency for a country
-  async getCurrencyForCountry(countryName) {
-    return new Promise(resolve => {
+  // Get currency by country name
+  async getCurrencyByCountry(countryName) {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        let currency = null;
+        // Find matching country
+        let countryCurrency = null;
         
-        // Find exact match
+        // Check exact match
         if (this.countryCurrencies[countryName]) {
-          currency = this.countryCurrencies[countryName];
+          countryCurrency = this.countryCurrencies[countryName];
         } else {
-          // Find partial match
+          // Check if country name contains the search term
           const countryKey = Object.keys(this.countryCurrencies).find(key => 
             key.toLowerCase().includes(countryName.toLowerCase()) || 
             countryName.toLowerCase().includes(key.toLowerCase())
           );
           
           if (countryKey) {
-            currency = this.countryCurrencies[countryKey];
+            countryCurrency = this.countryCurrencies[countryKey];
           } else {
-            // Default to USD for unknown countries
-            currency = 'USD';
+            // Use USD for unknown countries
+            countryCurrency = 'USD';
           }
         }
         
-        resolve(currency);
+        // Create currency pairs with the country's currency
+        const currencies = ['USD', 'EUR', 'GBP'];
+        const currencyPairs = [];
+        
+        for (const currency of currencies) {
+          if (currency !== countryCurrency) {
+            this.getExchangeRate(countryCurrency, currency).then(rate => {
+              currencyPairs.push({
+                fromCurrency: countryCurrency,
+                toCurrency: currency,
+                rate: rate,
+                lastUpdated: new Date().toISOString()
+              });
+            });
+            
+            currencyPairs.push({
+              fromCurrency: currency,
+              toCurrency: countryCurrency,
+              rate: Math.random() * 2,
+              lastUpdated: new Date().toISOString()
+            });
+          }
+        }
+        
+        resolve(currencyPairs);
       }, 300);
     });
-  },
-  
-  // Get currency conversion options for a country
-  async getCurrencyByCountry(countryName) {
-    const countryCurrency = await this.getCurrencyForCountry(countryName);
-    const currencies = ['USD', 'EUR', 'GBP', 'JPY'];
-    
-    // Filter out the country's own currency
-    const targetCurrencies = currencies.filter(c => c !== countryCurrency);
-    
-    // Get exchange rates for the top 3 currencies
-    const results = await Promise.all(
-      targetCurrencies.slice(0, 3).map(async (toCurrency) => {
-        const rate = await this.getExchangeRate(countryCurrency, toCurrency);
-        return {
-          fromCurrency: countryCurrency,
-          toCurrency,
-          rate
-        };
-      })
-    );
-    
-    return results;
   }
 };

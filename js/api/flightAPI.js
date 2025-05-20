@@ -4,82 +4,65 @@ export const flightAPI = {
   // Mock flight data
   mockFlightData: [
     {
-      id: 1,
-      origin: 'New York (JFK)',
-      destination: 'London (LHR)',
+      id: '1',
+      origin: 'New York',
+      destination: 'London',
       departureDate: '2025-06-15',
       returnDate: '2025-06-22',
-      price: '$850',
-      airline: 'British Airways',
-      destinationCountry: 'UK'
+      price: '$750',
+      airline: 'British Airways'
     },
     {
-      id: 2,
-      origin: 'San Francisco (SFO)',
-      destination: 'Tokyo (NRT)',
+      id: '2',
+      origin: 'San Francisco',
+      destination: 'Tokyo',
       departureDate: '2025-07-10',
-      returnDate: '2025-07-25',
-      price: '$1,200',
-      airline: 'JAL',
-      destinationCountry: 'Japan'
+      returnDate: '2025-07-24',
+      price: '$1,125',
+      airline: 'Japan Airlines'
     },
     {
-      id: 3,
-      origin: 'Miami (MIA)',
-      destination: 'Barcelona (BCN)',
-      departureDate: '2025-08-05',
-      returnDate: '2025-08-19',
-      price: '$980',
-      airline: 'Iberia',
-      destinationCountry: 'Spain'
+      id: '3',
+      origin: 'Chicago',
+      destination: 'Paris',
+      departureDate: '2025-05-20',
+      returnDate: '2025-05-27',
+      price: '$820',
+      airline: 'Air France'
     },
     {
-      id: 4,
-      origin: 'Chicago (ORD)',
-      destination: 'Paris (CDG)',
-      departureDate: '2025-06-20',
-      returnDate: '2025-07-05',
-      price: '$930',
-      airline: 'Air France',
-      destinationCountry: 'France'
+      id: '4',
+      origin: 'Miami',
+      destination: 'Cancun',
+      departureDate: '2025-06-05',
+      returnDate: '2025-06-12',
+      price: '$320',
+      airline: 'American Airlines'
     },
     {
-      id: 5,
-      origin: 'Los Angeles (LAX)',
-      destination: 'Sydney (SYD)',
-      departureDate: '2025-09-12',
-      returnDate: '2025-09-28',
+      id: '5',
+      origin: 'Los Angeles',
+      destination: 'Sydney',
+      departureDate: '2025-08-15',
+      returnDate: '2025-08-30',
       price: '$1,450',
-      airline: 'Qantas',
-      destinationCountry: 'Australia'
-    },
-    {
-      id: 6,
-      origin: 'London (LHR)',
-      destination: 'Dubai (DXB)',
-      departureDate: '2025-10-05',
-      returnDate: '2025-10-15',
-      price: '$780',
-      airline: 'Emirates',
-      destinationCountry: 'UAE'
+      airline: 'Qantas'
     }
   ],
   
-  // Airports by country
+  // Major airports by country
   countryAirports: {
-    'Japan': ['Tokyo (NRT)', 'Tokyo (HND)', 'Osaka (KIX)'],
-    'UK': ['London (LHR)', 'London (LGW)', 'Manchester (MAN)'],
-    'France': ['Paris (CDG)', 'Paris (ORY)', 'Nice (NCE)'],
-    'Italy': ['Rome (FCO)', 'Milan (MXP)', 'Venice (VCE)'],
-    'Australia': ['Sydney (SYD)', 'Melbourne (MEL)', 'Brisbane (BNE)'],
-    'United States': ['New York (JFK)', 'Los Angeles (LAX)', 'Chicago (ORD)'],
-    'UAE': ['Dubai (DXB)', 'Abu Dhabi (AUH)'],
-    'Spain': ['Barcelona (BCN)', 'Madrid (MAD)']
+    'United States': ['New York', 'Los Angeles', 'Chicago', 'Miami', 'Dallas'],
+    'UK': ['London', 'Manchester', 'Edinburgh', 'Glasgow', 'Birmingham'],
+    'Japan': ['Tokyo', 'Osaka', 'Fukuoka', 'Sapporo', 'Nagoya'],
+    'France': ['Paris', 'Nice', 'Lyon', 'Marseille', 'Toulouse'],
+    'Italy': ['Rome', 'Milan', 'Venice', 'Naples', 'Florence'],
+    'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide']
   },
   
-  // Get all flights
+  // Get all saved flights
   async getAllFlights() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         resolve(this.mockFlightData);
       }, 300);
@@ -88,93 +71,113 @@ export const flightAPI = {
   
   // Search for flights
   async searchFlights(origin, destination, departureDate) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        const results = this.mockFlightData.filter(flight => 
-          flight.origin.toLowerCase().includes(origin.toLowerCase()) &&
-          flight.destination.toLowerCase().includes(destination.toLowerCase())
-        );
+        // Generate random search results
+        const airlines = [
+          'United Airlines', 'Delta', 'American Airlines', 'British Airways', 
+          'Lufthansa', 'Air France', 'KLM', 'Emirates', 'Qatar Airways', 
+          'Singapore Airlines', 'Cathay Pacific', 'Japan Airlines'
+        ];
         
-        // If no exact matches, return flights to the destination
-        if (results.length === 0) {
-          const destinationResults = this.mockFlightData.filter(flight => 
-            flight.destination.toLowerCase().includes(destination.toLowerCase())
-          );
+        const results = [];
+        const numResults = Math.floor(Math.random() * 5) + 3; // 3-8 results
+        
+        for (let i = 0; i < numResults; i++) {
+          const airline = airlines[Math.floor(Math.random() * airlines.length)];
+          const basePrice = Math.floor(Math.random() * 1000) + 300; // $300-1300
           
-          if (destinationResults.length > 0) {
-            resolve(destinationResults);
+          // Adjust price based on class
+          let price;
+          let id = `search-${Date.now()}-${i}`;
+          
+          if (i === 0) {
+            price = `$${basePrice - 50}`; // Cheapest option
+          } else if (i === numResults - 1) {
+            price = `$${basePrice + 200}`; // Premium option
           } else {
-            // Generate a random flight
-            const airlines = ['American Airlines', 'Delta', 'United', 'Lufthansa', 'Emirates', 'Singapore Airlines'];
-            const randomPrice = Math.floor(Math.random() * 1000) + 500;
-            
-            resolve([{
-              id: 999,
-              origin: origin || 'New York (JFK)',
-              destination: destination,
-              departureDate: departureDate || '2025-06-15',
-              returnDate: '',
-              price: `$${randomPrice}`,
-              airline: airlines[Math.floor(Math.random() * airlines.length)]
-            }]);
+            price = `$${basePrice}`;
           }
-        } else {
-          resolve(results);
+          
+          results.push({
+            id: id,
+            origin: origin,
+            destination: destination,
+            departureDate: departureDate,
+            returnDate: '', // One-way flight
+            price: price,
+            airline: airline
+          });
         }
+        
+        resolve(results);
       }, 300);
     });
   },
   
-  // Get flights by destination country
-  async getFlightsByDestination(countryName) {
-    return new Promise(resolve => {
+  // Get flights by destination
+  async getFlightsByDestination(destination) {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        // Try to find exact country match
-        let results = this.mockFlightData.filter(flight => 
-          flight.destinationCountry?.toLowerCase() === countryName.toLowerCase()
-        );
+        // Find matching country for destination
+        let airports = [];
         
-        // If no exact matches, try partial match
-        if (results.length === 0) {
-          results = this.mockFlightData.filter(flight => 
-            flight.destinationCountry?.toLowerCase()?.includes(countryName.toLowerCase()) ||
-            countryName.toLowerCase().includes(flight.destinationCountry?.toLowerCase() || '')
+        // Check if destination is a country we have in our mappings
+        if (this.countryAirports[destination]) {
+          airports = this.countryAirports[destination];
+        } else {
+          // Check if destination is part of a country name
+          const countryKey = Object.keys(this.countryAirports).find(key => 
+            key.toLowerCase().includes(destination.toLowerCase()) || 
+            destination.toLowerCase().includes(key.toLowerCase())
           );
+          
+          if (countryKey) {
+            airports = this.countryAirports[countryKey];
+          } else {
+            // Use the destination as a single airport
+            airports = [destination];
+          }
         }
         
-        // If still no results, generate flights to the country
-        if (results.length === 0) {
-          // Find destinations for the country
-          let destinations = [];
+        // Generate flights to the found airports
+        const results = [];
+        const origins = ['New York', 'London', 'Tokyo', 'Los Angeles', 'Paris'];
+        const airlines = [
+          'United Airlines', 'Delta', 'American Airlines', 'British Airways', 
+          'Lufthansa', 'Air France', 'KLM', 'Emirates', 'Qatar Airways'
+        ];
+        
+        // Pick a random origin
+        const origin = origins[Math.floor(Math.random() * origins.length)];
+        
+        // Generate 1-3 flights
+        const numResults = Math.min(3, airports.length);
+        
+        for (let i = 0; i < numResults; i++) {
+          const airport = airports[i];
+          const airline = airlines[Math.floor(Math.random() * airlines.length)];
+          const basePrice = Math.floor(Math.random() * 800) + 400; // $400-1200
           
-          // Check if we have airports for this country
-          const countryKey = Object.keys(this.countryAirports).find(key => 
-            key.toLowerCase() === countryName.toLowerCase() ||
-            key.toLowerCase().includes(countryName.toLowerCase()) ||
-            countryName.toLowerCase().includes(key.toLowerCase())
-          );
+          // Generate a departure date 1-3 months in the future
+          const daysToAdd = Math.floor(Math.random() * 90) + 30; // 30-120 days
+          const departureDate = new Date();
+          departureDate.setDate(departureDate.getDate() + daysToAdd);
           
-          if (countryKey && this.countryAirports[countryKey]) {
-            destinations = this.countryAirports[countryKey];
-          } else {
-            // Create fake destination
-            destinations = [`${countryName} International Airport`];
-          }
+          // Generate a return date 7-14 days after departure
+          const stayDuration = Math.floor(Math.random() * 7) + 7; // 7-14 days
+          const returnDate = new Date(departureDate);
+          returnDate.setDate(returnDate.getDate() + stayDuration);
           
-          // Generate flights to these destinations
-          const airlines = ['American Airlines', 'Delta', 'United', 'Lufthansa', 'Emirates', 'Singapore Airlines'];
-          const origins = ['New York (JFK)', 'London (LHR)', 'Tokyo (NRT)'];
-          
-          results = destinations.map((destination, index) => ({
-            id: 1000 + index,
-            origin: origins[index % origins.length],
-            destination: destination,
-            departureDate: '2025-06-15',
-            returnDate: '2025-06-29',
-            price: `$${Math.floor(Math.random() * 1000) + 500}`,
-            airline: airlines[Math.floor(Math.random() * airlines.length)],
-            destinationCountry: countryName
-          }));
+          results.push({
+            id: `dest-${Date.now()}-${i}`,
+            origin: origin,
+            destination: airport,
+            departureDate: departureDate.toISOString().split('T')[0],
+            returnDate: returnDate.toISOString().split('T')[0],
+            price: `$${basePrice}`,
+            airline: airline
+          });
         }
         
         resolve(results);
