@@ -1,7 +1,7 @@
 
 // Currency API module
 export const currencyAPI = {
-  // Mock exchange rates
+  // Mock exchange rates for demonstration
   mockExchangeRates: {
     'USD': {
       'EUR': 0.91,
@@ -41,7 +41,7 @@ export const currencyAPI = {
     }
   },
   
-  // Country to currency mapping
+  // Mapping of countries to their currencies
   countryCurrencies: {
     'United States': 'USD',
     'Japan': 'JPY',
@@ -53,7 +53,12 @@ export const currencyAPI = {
     'India': 'INR'
   },
   
-  // Get exchange rate between two currencies
+  /**
+   * Get the exchange rate between two currencies
+   * @param {string} fromCurrency - Source currency code
+   * @param {string} toCurrency - Target currency code
+   * @returns {Promise<number>} Exchange rate value
+   */
   async getExchangeRate(fromCurrency, toCurrency) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -61,17 +66,21 @@ export const currencyAPI = {
         if (this.mockExchangeRates[fromCurrency] && this.mockExchangeRates[fromCurrency][toCurrency]) {
           resolve(this.mockExchangeRates[fromCurrency][toCurrency]);
         } else if (fromCurrency === toCurrency) {
-          resolve(1.0);
+          resolve(1.0); // Same currency, rate is 1:1
         } else {
-          // Generate a random exchange rate if not found
+          // Generate a realistic random exchange rate if not found
           const baseRate = Math.random() * 2;
           resolve(baseRate);
         }
-      }, 300);
+      }, 300); // Simulate network delay
     });
   },
   
-  // Get currency by country name
+  /**
+   * Get currency pairs by country name
+   * @param {string} countryName - Name of the country
+   * @returns {Promise<Array>} Array of currency pairs
+   */
   async getCurrencyByCountry(countryName) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -121,7 +130,7 @@ export const currencyAPI = {
         }
         
         resolve(currencyPairs);
-      }, 300);
+      }, 300); // Simulate network delay
     });
   }
 };

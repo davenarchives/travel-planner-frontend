@@ -1,13 +1,13 @@
 
-/* Main Styles for Wanderlust Compass */
+/* Main Styles for Travel Planner */
 
-/* Variables */
+/* Variables with enhanced color palette */
 :root {
-  --primary-color: #3a86ff;
-  --secondary-color: #ff006e;
-  --weather-color: #00b4d8;
-  --country-color: #8338ec;
-  --currency-color: #fb8500;
+  --primary-color: #4361ee;
+  --secondary-color: #ff6b6b;
+  --weather-color: #48cae4;
+  --country-color: #9b5de5;
+  --currency-color: #ffbe0b;
   --news-color: #f15bb5;
   --flight-color: #06d6a0;
   
@@ -19,8 +19,8 @@
   
   --sidebar-width: 240px;
   --header-height: 60px;
-  --border-radius: 8px;
-  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --border-radius: 10px;
+  --card-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   --transition-speed: 0.3s;
 }
 
@@ -68,10 +68,10 @@ input, select, button {
   min-height: 100vh;
 }
 
-/* Sidebar */
+/* Sidebar with enhanced colors */
 .sidebar {
   width: var(--sidebar-width);
-  background-color: var(--card-bg);
+  background: linear-gradient(180deg, #2b2d42 0%, #1a1a2e 100%);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -85,7 +85,7 @@ input, select, button {
 
 .sidebar-header {
   padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-title {
@@ -93,10 +93,11 @@ input, select, button {
   align-items: center;
   gap: 0.5rem;
   font-size: 1.5rem;
+  color: white;
 }
 
 .sidebar-icon i {
-  color: var(--primary-color);
+  color: var(--secondary-color);
 }
 
 .sidebar-content {
@@ -114,9 +115,9 @@ input, select, button {
   align-items: center;
   padding: 0.75rem 1rem;
   width: 100%;
-  transition: background-color var(--transition-speed);
+  transition: all var(--transition-speed);
   font-size: 1rem;
-  color: var(--text-color);
+  color: #e0e0e0;
 }
 
 .sidebar-menu-button i {
@@ -126,19 +127,21 @@ input, select, button {
 }
 
 .sidebar-menu-button:hover {
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(3px);
 }
 
 .sidebar-menu-button.active {
-  background-color: rgba(0,0,0,0.08);
+  background-color: rgba(255, 255, 255, 0.15);
   font-weight: 600;
+  border-left: 3px solid var(--secondary-color);
 }
 
 .sidebar-footer {
   padding: 1rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.6);
   text-align: center;
 }
 
@@ -156,6 +159,7 @@ input, select, button {
 .content-header h1 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
+  color: var(--primary-color);
 }
 
 .content-header p {
@@ -175,44 +179,60 @@ input, select, button {
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.search-bar input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+  outline: none;
 }
 
 .search-bar button {
-  padding: 0.75rem 1rem;
-  background-color: var(--primary-color);
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(45deg, var(--primary-color), #6979F8);
   color: white;
   border-radius: var(--border-radius);
-  transition: background-color var(--transition-speed);
+  transition: all 0.3s;
+  font-weight: 500;
 }
 
 .search-bar button:hover {
-  background-color: #2b76e9;
+  background: linear-gradient(45deg, #3a53e3, #5767e0);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(67, 97, 238, 0.25);
 }
 
 /* Dashboard */
 .dashboard-hero {
   text-align: center;
-  margin-bottom: 2rem;
-  padding: 2rem 1rem;
-  background-color: var(--card-bg);
+  margin-bottom: 2.5rem;
+  padding: 3rem 1.5rem;
+  background: linear-gradient(120deg, #4361ee, #3a0ca3);
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
+  color: white;
 }
 
 .hero-title {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+  font-size: 2.75rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .hero-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: var(--text-muted);
+  opacity: 0.9;
+  font-weight: 500;
 }
 
 .hero-text {
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
+  font-size: 1.1rem;
+  opacity: 0.8;
 }
 
 .module-grid {
@@ -221,25 +241,26 @@ input, select, button {
   gap: 1.5rem;
 }
 
-/* Cards */
+/* Cards with enhanced styling */
 .card {
   background-color: var(--card-bg);
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
   overflow: hidden;
   transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+  border: none;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 1.25rem;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -254,92 +275,134 @@ input, select, button {
 }
 
 .icon-button {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color var(--transition-speed);
+  transition: all var(--transition-speed);
+  color: #fff;
 }
 
 .icon-button:hover {
-  background-color: rgba(0,0,0,0.05);
+  transform: rotate(5deg) scale(1.1);
 }
 
 .card-content {
-  padding: 1rem;
+  padding: 1.25rem;
 }
 
-/* Module Cards */
+/* Module Cards with vibrant colors */
 .module-card {
   background-color: var(--card-bg);
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
   overflow: hidden;
-  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+  transition: all var(--transition-speed);
+  border: none;
+  position: relative;
 }
 
 .module-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
 .module-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  padding: 1.25rem;
 }
 
 .module-card-title {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 600;
 }
 
 .module-card-actions {
   display: flex;
-  gap: 0.5rem;
-}
-
-.module-card-content {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
   gap: 0.75rem;
 }
 
+.module-card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .module-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+  font-size: 3rem;
+  margin-bottom: 1.25rem;
   text-align: center;
+  transition: all 0.5s;
+}
+
+.module-card:hover .module-icon {
+  transform: scale(1.2);
 }
 
 .module-description {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  color: var(--text-muted);
 }
 
 .module-count {
   font-size: 0.9rem;
-  color: var(--text-muted);
+  font-weight: 500;
 }
 
-/* Module Icon Colors */
+/* Module Icon Colors with enhanced vibrancy */
 .weather-icon i {
   color: var(--weather-color);
 }
+
 .country-icon i {
   color: var(--country-color);
 }
+
 .currency-icon i {
   color: var(--currency-color);
 }
+
 .news-icon i {
   color: var(--news-color);
 }
+
 .flight-icon i {
   color: var(--flight-color);
+}
+
+/* Weather Card color scheme */
+.weather-header {
+  background: linear-gradient(45deg, var(--weather-color), #90e0ef);
+  color: #fff;
+}
+
+/* Country Card color scheme */
+.country-header {
+  background: linear-gradient(45deg, var(--country-color), #c77dff);
+  color: #fff;
+}
+
+/* Currency Card color scheme */
+.currency-header {
+  background: linear-gradient(45deg, var(--currency-color), #ffd166);
+  color: #fff;
+}
+
+/* News Card color scheme */
+.news-header {
+  background: linear-gradient(45deg, var(--news-color), #ff8fab);
+  color: #fff;
+}
+
+/* Flight Card color scheme */
+.flight-header {
+  background: linear-gradient(45deg, var(--flight-color), #08bdba);
+  color: #fff;
 }
 
 /* Grid and Layouts */
@@ -353,39 +416,57 @@ input, select, button {
   grid-template-columns: 1fr;
 }
 
-/* Forms */
+/* Forms with enhanced styling */
 .input-container {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
 .form-input {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
   font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.form-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+  outline: none;
 }
 
 .form-select {
   padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
   font-size: 1rem;
   background-color: white;
+  transition: all 0.3s;
+}
+
+.form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+  outline: none;
 }
 
 .primary-button {
   padding: 0.75rem 1.5rem;
-  background-color: var(--primary-color);
+  background: linear-gradient(45deg, var(--primary-color), #6979F8);
   color: white;
   border-radius: var(--border-radius);
-  transition: background-color var(--transition-speed);
+  transition: all 0.3s;
+  font-weight: 500;
+  border: none;
 }
 
 .primary-button:hover {
-  background-color: #2b76e9;
+  background: linear-gradient(45deg, #3a53e3, #5767e0);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(67, 97, 238, 0.25);
 }
 
 .wide-button {
@@ -403,13 +484,14 @@ input, select, button {
   gap: 0.5rem;
 }
 
-/* Flight Search Form */
+/* Flight Search Form with enhanced styling */
 .flight-search-form {
   background-color: var(--card-bg);
   border-radius: var(--border-radius);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   box-shadow: var(--card-shadow);
+  border-top: 4px solid var(--flight-color);
 }
 
 .form-row {
@@ -427,10 +509,11 @@ input, select, button {
 
 .form-group label {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
-/* Weather Card Specifics */
+/* Weather Card Specifics with enhanced styling */
 .weather-display {
   display: flex;
   align-items: center;
@@ -438,13 +521,14 @@ input, select, button {
 }
 
 .weather-icon {
-  font-size: 3rem;
+  font-size: 3.5rem;
   color: var(--weather-color);
+  text-shadow: 0 2px 10px rgba(72, 202, 228, 0.3);
 }
 
 .temperature {
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 2.5rem;
+  font-weight: 700;
 }
 
 .condition {
@@ -452,7 +536,7 @@ input, select, button {
   color: var(--text-muted);
 }
 
-/* Country Card Specifics */
+/* Country Card Specifics with enhanced styling */
 .country-info {
   display: flex;
   flex-direction: column;
@@ -462,11 +546,12 @@ input, select, button {
 .info-grid {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.5rem 1rem;
+  gap: 0.75rem 1.25rem;
 }
 
 .info-label {
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--country-color);
 }
 
 .tags-container {
@@ -476,13 +561,15 @@ input, select, button {
 }
 
 .tag {
-  padding: 0.25rem 0.5rem;
-  background-color: rgba(0,0,0,0.05);
-  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  background-color: rgba(155, 93, 229, 0.1);
+  border-radius: var(--border-radius);
   font-size: 0.875rem;
+  color: var(--country-color);
+  border: 1px solid rgba(155, 93, 229, 0.3);
 }
 
-/* Currency Card Specifics */
+/* Currency Card Specifics with enhanced styling */
 .exchange-rate-display {
   display: flex;
   justify-content: space-between;
@@ -492,18 +579,20 @@ input, select, button {
 
 .rate-info {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--currency-color);
 }
 
 .converter {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
 .amount-input {
   width: 100px;
+  border-color: var(--currency-color);
 }
 
 .last-updated {
@@ -511,26 +600,30 @@ input, select, button {
   color: var(--text-muted);
 }
 
-/* News Card Specifics */
+/* News Card Specifics with enhanced styling */
 .news-meta {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .news-source {
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--news-color);
 }
 
 .news-category {
-  background-color: rgba(0,0,0,0.05);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  background-color: rgba(241, 91, 181, 0.15);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius);
   font-size: 0.875rem;
+  color: var(--news-color);
+  border: 1px solid rgba(241, 91, 181, 0.3);
 }
 
 .news-snippet {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
 }
 
 .news-footer {
@@ -545,36 +638,39 @@ input, select, button {
 }
 
 .save-article-button {
-  padding: 0.25rem 0.5rem;
+  padding: 0.35rem 0.75rem;
   border: 1px solid var(--news-color);
   color: var(--news-color);
-  border-radius: 4px;
-  transition: background-color var(--transition-speed);
+  border-radius: var(--border-radius);
+  transition: all 0.3s;
+  font-weight: 500;
 }
 
 .save-article-button:hover {
-  background-color: rgba(241, 91, 181, 0.1);
+  background-color: var(--news-color);
+  color: white;
 }
 
-/* Flight Card Specifics */
+/* Flight Card Specifics with enhanced styling */
 .flight-info {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .route-info {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .origin-destination {
   font-size: 1.25rem;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  color: var(--flight-color);
 }
 
 .date-info {
@@ -586,11 +682,13 @@ input, select, button {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-color);
 }
 
 .price {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.75rem;
+  font-weight: 700;
   color: var(--flight-color);
 }
 
@@ -598,9 +696,11 @@ input, select, button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
-/* Tabs */
+/* Tabs with enhanced styling */
 .tabs {
   margin-top: 1.5rem;
 }
@@ -608,15 +708,15 @@ input, select, button {
 .tabs-list {
   display: flex;
   gap: 0.25rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
   margin-bottom: 1rem;
 }
 
 .tab-item {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.25rem;
   cursor: pointer;
   border-bottom: 3px solid transparent;
-  transition: border-color var(--transition-speed);
+  transition: all var(--transition-speed);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -629,7 +729,8 @@ input, select, button {
 
 .tab-item.active {
   border-bottom-color: var(--primary-color);
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 .tab-pane {
@@ -638,6 +739,12 @@ input, select, button {
 
 .tab-pane.active {
   display: block;
+  animation: fade-in 0.5s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .tab-content-inner {
@@ -652,6 +759,7 @@ input, select, button {
 .results-header h2 {
   font-size: 1.75rem;
   margin-bottom: 0.5rem;
+  color: var(--primary-color);
 }
 
 .results-header p {
@@ -660,14 +768,15 @@ input, select, button {
 
 /* Search Results Header */
 .search-results-heading {
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border-color);
 }
 
 .search-results-heading h3 {
-  font-size: 1.25rem;
-  margin-bottom: 0.25rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
 }
 
 .search-results-heading p {
@@ -678,14 +787,19 @@ input, select, button {
 /* No Data Messages */
 .no-data {
   text-align: center;
-  padding: 2rem;
+  padding: 3rem;
   color: var(--text-muted);
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: var(--border-radius);
 }
 
 .error-message {
   text-align: center;
   padding: 2rem;
   color: var(--secondary-color);
+  background-color: rgba(255, 107, 107, 0.05);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 107, 107, 0.2);
 }
 
 /* Responsive Design */
@@ -717,5 +831,13 @@ input, select, button {
   
   .module-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
   }
 }
