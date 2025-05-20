@@ -85,10 +85,24 @@ export const dashboardModule = {
     // Handle view button click
     const viewButton = card.querySelector('.view-button');
     if (viewButton) {
-      viewButton.addEventListener('click', () => {
+      viewButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent card click event from triggering
         loadModule(module.id);
       });
     }
+    
+    // Make the entire card clickable
+    card.addEventListener('click', () => {
+      loadModule(module.id);
+    });
+    
+    // Add keyboard accessibility
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        loadModule(module.id);
+      }
+    });
     
     container.appendChild(card);
   }

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { 
   Sidebar, 
@@ -44,7 +45,7 @@ const DashboardSidebar = ({ activeModule, onModuleChange }: DashboardSidebarProp
           <span className="text-[hsl(var(--sidebar-primary))]">
             <Plane className="h-6 w-6" />
           </span>
-          <span>Wanderlust</span>
+          <span>Travel Planner</span>
         </h2>
       </SidebarHeader>
       
@@ -68,7 +69,7 @@ const DashboardSidebar = ({ activeModule, onModuleChange }: DashboardSidebarProp
       
       <SidebarFooter className="p-4">
         <div className="text-sm text-sidebar-foreground/70">
-          Wanderlust Compass v1.0
+          Travel Planner v1.0
         </div>
       </SidebarFooter>
     </Sidebar>
