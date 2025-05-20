@@ -1,29 +1,9 @@
 
-import { getTemplate } from '../templates.js';
+import { weatherAPI } from '../api/weatherAPI.js';
+import { getTemplate } from '../utils/templatesUtil.js';
 
 export const weatherModule = {
-  // Mock data for weather
-  weatherData: [
-    {
-      city: 'New York',
-      temperature: 72,
-      condition: 'Partly Cloudy',
-      icon: 'fa-cloud-sun'
-    },
-    {
-      city: 'London',
-      temperature: 63,
-      condition: 'Rainy',
-      icon: 'fa-cloud-rain'
-    },
-    {
-      city: 'Tokyo',
-      temperature: 81,
-      condition: 'Cloudy',
-      icon: 'fa-cloud'
-    }
-  ],
-  
+  // Initialize the weather module
   init(container) {
     // Create the weather module view
     const template = getTemplate('weather-template');
@@ -36,6 +16,7 @@ export const weatherModule = {
     this.setupEventListeners();
   },
   
+  // Set up event listeners for the weather module
   setupEventListeners() {
     // Add city button
     const addCityBtn = document.getElementById('add-city-btn');
@@ -43,7 +24,7 @@ export const weatherModule = {
       addCityBtn.addEventListener('click', () => {
         const input = document.getElementById('weather-city-input');
         if (input && input.value.trim() !== '') {
-          this.addWeatherCard(input.value);
+          this.addCity(input.value);
           input.value = '';
         }
       });
@@ -61,48 +42,57 @@ export const weatherModule = {
     }
   },
   
+  // Load initial weather data
   loadWeatherData() {
-    this.weatherData.forEach(weather => {
-      this.addWeatherCard(weather.city, weather.temperature, weather.condition, weather.icon);
+    // Initial cities to load
+    const cities = ['New York', 'London', 'Tokyo'];
+    
+    // Get weather data for each city
+    cities.forEach(city => {
+      this.addCity(city);
     });
   },
   
-  addWeatherCard(city, temperature, condition, icon) {
+  // Add a city to the weather tracking
+  addCity(city) {
     const weatherCards = document.getElementById('weather-cards');
     if (!weatherCards) return;
     
-    // Generate random data if not provided
-    temperature = temperature || Math.floor(Math.random() * 30) + 50;
-    const conditions = ['Sunny', 'Cloudy', 'Rainy', 'Partly Cloudy'];
-    condition = condition || conditions[Math.floor(Math.random() * conditions.length)];
-    const icons = ['fa-sun', 'fa-cloud', 'fa-cloud-rain', 'fa-cloud-sun'];
-    icon = icon || icons[Math.floor(Math.random() * icons.length)];
-    
-    const template = getTemplate('weather-card-template');
-    
-    template.querySelector('.card-title').textContent = city;
-    template.querySelector('.weather-icon').innerHTML = `<i class="fas ${icon}"></i>`;
-    template.querySelector('.temperature').textContent = `${temperature}°F`;
-    template.querySelector('.condition').textContent = condition;
-    
-    // Add the card to the grid
-    weatherCards.appendChild(template);
+    // Get weather data from API
+    weatherAPI.getWeather(city)
+      .then(weather => {
+        const card = document.importNode(document.getElementById('weather-card-template').content, true);
+        
+        card.querySelector('.card-title').textContent = weather.city;
+        card.querySelector('.weather-icon').innerHTML = `<i class="fas ${weather.icon}"></i>`;
+        card.querySelector('.temperature').textContent = `${weather.temperature}°F`;
+        card.querySelector('.condition').textContent = weather.condition;
+        
+        weatherCards.appendChild(card);
+      })
+      .catch(error => {
+        console.error('Error loading weather data:', error);
+      });
   },
   
+  // Handle delete button click
   handleDelete(card) {
-    // In a real app, this would call an API to delete the data
     card.remove();
-    console.log('Weather card deleted');
   },
   
+  // Handle edit button click
   handleEdit(card) {
-    // In a real app, this would open an edit form
     const city = card.querySelector('.card-title').textContent;
-    console.log(`Editing weather card for ${city}`);
     
-    // Simple demonstration - update temperature
-    const tempElement = card.querySelector('.temperature');
-    const newTemp = Math.floor(Math.random() * 30) + 50;
-    tempElement.textContent = `${newTemp}°F`;
+    // Get fresh weather data
+    weatherAPI.getWeather(city)
+      .then(weather => {
+        card.querySelector('.weather-icon').innerHTML = `<i class="fas ${weather.icon}"></i>`;
+        card.querySelector('.temperature').textContent = `${weather.temperature}°F`;
+        card.querySelector('.condition').textContent = weather.condition;
+      })
+      .catch(error => {
+        console.error('Error updating weather data:', error);
+      });
   }
 };

@@ -1,35 +1,9 @@
 
-import { getTemplate } from '../templates.js';
+import { countryAPI } from '../api/countryAPI.js';
+import { getTemplate } from '../utils/templatesUtil.js';
 
 export const countryModule = {
-  // Mock data for countries
-  countryData: [
-    {
-      name: 'Japan',
-      capital: 'Tokyo',
-      population: '126.3 million',
-      region: 'Asia',
-      flag: '🇯🇵',
-      tags: ['Bucket List', 'Cherry Blossoms']
-    },
-    {
-      name: 'Italy',
-      capital: 'Rome',
-      population: '60.4 million',
-      region: 'Europe',
-      flag: '🇮🇹',
-      tags: ['Food', 'History']
-    },
-    {
-      name: 'New Zealand',
-      capital: 'Wellington',
-      population: '4.9 million',
-      region: 'Oceania',
-      flag: '🇳🇿',
-      tags: ['Nature', 'Adventure']
-    }
-  ],
-  
+  // Initialize the country module
   init(container) {
     // Create the country module view
     const template = getTemplate('country-template');
@@ -42,6 +16,7 @@ export const countryModule = {
     this.setupEventListeners();
   },
   
+  // Set up event listeners for the country module
   setupEventListeners() {
     // Add country button
     const addCountryBtn = document.getElementById('add-country-btn');
@@ -49,7 +24,7 @@ export const countryModule = {
       addCountryBtn.addEventListener('click', () => {
         const input = document.getElementById('country-search-input');
         if (input && input.value.trim() !== '') {
-          this.addCountryCard(input.value);
+          this.addCountry(input.value);
           input.value = '';
         }
       });
@@ -67,56 +42,55 @@ export const countryModule = {
     }
   },
   
+  // Load initial country data
   loadCountryData() {
-    this.countryData.forEach(country => {
-      this.addCountryCard(country.name, country);
+    // Initial countries to load
+    const countries = ['Japan', 'Italy', 'New Zealand'];
+    
+    // Get data for each country
+    countries.forEach(country => {
+      this.addCountry(country);
     });
   },
   
-  addCountryCard(name, data) {
+  // Add a country to the explorer
+  addCountry(countryName) {
     const countryCards = document.getElementById('country-cards');
     if (!countryCards) return;
     
-    // Use provided data or generate placeholder data
-    const country = data || {
-      capital: 'Sample Capital',
-      population: 'Unknown',
-      region: 'Unknown',
-      flag: '🏳️',
-      tags: ['New']
-    };
-    
-    const template = getTemplate('country-card-template');
-    
-    template.querySelector('.card-title').textContent = `${country.flag || ''} ${name}`;
-    template.querySelector('.capital').textContent = country.capital;
-    template.querySelector('.population').textContent = country.population;
-    template.querySelector('.region').textContent = country.region;
-    
-    const tagsContainer = template.querySelector('.tags-container');
-    country.tags.forEach(tag => {
-      const tagElement = document.createElement('span');
-      tagElement.className = 'tag';
-      tagElement.textContent = tag;
-      tagsContainer.appendChild(tagElement);
-    });
-    
-    // Add the card to the grid
-    countryCards.appendChild(template);
+    // Get country data from API
+    countryAPI.getCountryInfo(countryName)
+      .then(country => {
+        const card = document.importNode(document.getElementById('country-card-template').content, true);
+        
+        card.querySelector('.card-title').textContent = `${country.flag || ''} ${country.name}`;
+        card.querySelector('.capital').textContent = country.capital;
+        card.querySelector('.population').textContent = country.population;
+        card.querySelector('.region').textContent = country.region;
+        
+        const tagsContainer = card.querySelector('.tags-container');
+        country.tags.forEach(tag => {
+          const tagElement = document.createElement('span');
+          tagElement.className = 'tag';
+          tagElement.textContent = tag;
+          tagsContainer.appendChild(tagElement);
+        });
+        
+        countryCards.appendChild(card);
+      })
+      .catch(error => {
+        console.error('Error loading country data:', error);
+      });
   },
   
+  // Handle delete button click
   handleDelete(card) {
-    // In a real app, this would call an API to delete the data
     card.remove();
-    console.log('Country card deleted');
   },
   
+  // Handle edit button click
   handleEdit(card) {
-    // In a real app, this would open an edit form
-    const country = card.querySelector('.card-title').textContent;
-    console.log(`Editing country card for ${country}`);
-    
-    // Simple demonstration - add a new tag
+    // Add a random tag to the country card
     const tagsContainer = card.querySelector('.tags-container');
     const newTags = ['Favorite', 'Must Visit', 'Budget Friendly', 'Family Friendly'];
     const randomTag = newTags[Math.floor(Math.random() * newTags.length)];

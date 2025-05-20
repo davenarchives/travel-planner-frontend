@@ -1,8 +1,9 @@
 
-import { getTemplate } from '../templates.js';
 import { loadModule } from '../app.js';
+import { getTemplate } from '../utils/templatesUtil.js';
 
 export const dashboardModule = {
+  // Initialize the dashboard module
   init(container) {
     // Create the dashboard view
     const template = getTemplate('dashboard-template');
@@ -12,6 +13,7 @@ export const dashboardModule = {
     this.loadDashboardData();
   },
   
+  // Load dashboard data
   loadDashboardData() {
     const moduleGrid = document.querySelector('.module-grid');
     if (!moduleGrid) return;
@@ -64,6 +66,7 @@ export const dashboardModule = {
     });
   },
   
+  // Create a module card
   createModuleCard(container, module) {
     const template = getTemplate('module-card-template');
     const card = template.querySelector('.module-card');
@@ -81,14 +84,6 @@ export const dashboardModule = {
       <p class="module-description">${module.description}</p>
       <div class="module-count">${module.count} saved items</div>
     `;
-    
-    // Handle view button click
-    const viewButton = card.querySelector('.view-button');
-    if (viewButton) {
-      viewButton.addEventListener('click', () => {
-        loadModule(module.id);
-      });
-    }
     
     container.appendChild(card);
   }

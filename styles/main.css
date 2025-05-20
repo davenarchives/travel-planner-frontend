@@ -1,47 +1,52 @@
 
-/* Base Styles */
+/* Main CSS Variables */
 :root {
+  --bg-color: #f9fafb;
+  --text-color: #111827;
+  --header-color: #374151;
+  --muted-color: #6b7280;
+  --border-color: #d1d5db;
+  --card-bg: #ffffff;
+  --sidebar-bg: #1f2937;
+  --sidebar-text: #f3f4f6;
+  --sidebar-active: #111827;
+  --sidebar-active-bg: #f3f4f6;
   --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --secondary-color: #9ca3af;
+  --success-color: #10b981;
+  --error-color: #ef4444;
+  --border-radius: 0.5rem;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
   --weather-color: #3b82f6;
   --country-color: #10b981;
-  --currency-color: #f59e0b;
-  --news-color: #8b5cf6;
-  --flight-color: #ec4899;
-  
-  --sidebar-width: 250px;
-  --sidebar-bg: #1f2937;
-  --sidebar-text: #f9fafb;
-  --sidebar-accent: rgba(255, 255, 255, 0.1);
-  --sidebar-hover: rgba(255, 255, 255, 0.05);
-  
-  --bg-color: #f9fafb;
-  --card-bg: #ffffff;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --border-color: #e5e7eb;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  
-  --radius-sm: 0.125rem;
-  --radius: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
+  --currency-color: #8b5cf6;
+  --news-color: #f59e0b;
+  --flight-color: #06b6d4;
 }
 
+/* Base Styles */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-color);
-  color: var(--text-primary);
-  line-height: 1.5;
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
 }
 
 /* Layout */
@@ -50,19 +55,50 @@ body {
   min-height: 100vh;
 }
 
-/* Sidebar Styles */
 .sidebar {
-  width: var(--sidebar-width);
+  width: 260px;
   background-color: var(--sidebar-bg);
   color: var(--sidebar-text);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--border-color);
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 10;
+  overflow-y: auto;
 }
 
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+  }
+  
+  .sidebar-title span:last-child,
+  .sidebar-menu-button span {
+    display: none;
+  }
+  
+  .main-content {
+    margin-left: 70px;
+  }
+  
+  .sidebar-footer-text {
+    font-size: 0.7rem;
+  }
+}
+
+/* Sidebar */
 .sidebar-header {
-  padding: 1rem;
-  border-bottom: 1px solid var(--sidebar-accent);
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 .sidebar-title {
@@ -70,6 +106,12 @@ body {
   align-items: center;
   gap: 0.5rem;
   font-size: 1.25rem;
+}
+
+.sidebar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-content {
@@ -81,104 +123,133 @@ body {
   list-style: none;
 }
 
+.sidebar-menu-item {
+  margin: 0.25rem 0;
+}
+
 .sidebar-menu-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   width: 100%;
   padding: 0.75rem 1rem;
-  background: none;
   border: none;
+  background: none;
   color: var(--sidebar-text);
-  text-align: left;
   font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  text-align: left;
+  gap: 0.75rem;
+  transition: all 0.2s;
 }
 
 .sidebar-menu-button:hover {
-  background-color: var(--sidebar-hover);
+  background-color: rgba(255,255,255,0.1);
 }
 
 .sidebar-menu-button.active {
-  background-color: var(--sidebar-accent);
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-active);
 }
 
 .sidebar-footer {
   padding: 1rem;
-  border-top: 1px solid var(--sidebar-accent);
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+  text-align: center;
 }
 
-/* Main Content */
-.main-content {
-  flex: 1;
-  padding: 1.5rem;
-  overflow-y: auto;
-}
-
+/* Content Header */
 .content-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-#module-title {
-  font-size: 1.5rem;
-  font-weight: bold;
+.content-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--header-color);
+  margin-bottom: 0.5rem;
 }
 
-#module-description {
-  color: var(--text-secondary);
+.content-header p {
+  color: var(--muted-color);
+}
+
+.search-bar {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+}
+
+.search-bar button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 0 1rem;
+  transition: background-color 0.2s;
+}
+
+.search-bar button:hover {
+  background-color: var(--primary-hover);
 }
 
 /* Cards */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.news-grid {
-  grid-template-columns: 1fr;
+  gap: 1.5rem;
 }
 
 .card {
   background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  overflow: hidden;
+  border-radius: var(--border-radius);
   box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
 }
 
 .card-header {
-  padding: 0.75rem;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.weather-header {
+.card-header.weather-header {
   background-color: var(--weather-color);
   color: white;
 }
 
-.country-header {
+.card-header.country-header {
   background-color: var(--country-color);
   color: white;
 }
 
-.currency-header {
+.card-header.currency-header {
   background-color: var(--currency-color);
   color: white;
 }
 
-.news-header {
+.card-header.news-header {
   background-color: var(--news-color);
   color: white;
 }
 
-.flight-header {
+.card-header.flight-header {
   background-color: var(--flight-color);
   color: white;
 }
@@ -186,64 +257,128 @@ body {
 .card-title {
   font-size: 1.125rem;
   font-weight: 600;
+  margin: 0;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .card-content {
   padding: 1rem;
 }
 
-.card-actions {
-  display: flex;
-  gap: 0.25rem;
+/* Module Cards */
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
-/* Form Elements */
-.input-container {
+.module-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.2s;
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+}
+
+.module-card:hover {
+  transform: translateY(-5px);
+}
+
+.module-card-header {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.module-card-title {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.module-card-content {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.module-description {
+  color: var(--muted-color);
+}
+
+.module-count {
+  margin-top: auto;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted-color);
+}
+
+.module-icon {
+  font-size: 2.5rem;
   margin-bottom: 1rem;
 }
 
-.currency-inputs {
-  align-items: center;
+.weather-icon i {
+  color: var(--weather-color);
 }
 
-.form-input {
-  flex: 1;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  font-size: 0.875rem;
+.country-icon i {
+  color: var(--country-color);
 }
 
-.form-select {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  font-size: 0.875rem;
-  background-color: white;
+.currency-icon i {
+  color: var(--currency-color);
 }
 
-.select-container {
+.news-icon i {
+  color: var(--news-color);
+}
+
+.flight-icon i {
+  color: var(--flight-color);
+}
+
+/* Forms */
+.input-container {
+  margin-bottom: 1.5rem;
   display: flex;
-  align-items: center;
   gap: 0.5rem;
-  flex: 1;
+}
+
+.form-input, .form-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  width: 100%;
 }
 
 .primary-button {
-  padding: 0.5rem 1rem;
   background-color: var(--primary-color);
   color: white;
   border: none;
-  border-radius: var(--radius);
-  font-size: 0.875rem;
-  cursor: pointer;
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
   transition: background-color 0.2s;
 }
 
 .primary-button:hover {
-  background-color: #2563eb;
+  background-color: var(--primary-hover);
+}
+
+.wide-button {
+  width: 100%;
 }
 
 .icon-button {
@@ -251,133 +386,47 @@ body {
   border: none;
   color: inherit;
   cursor: pointer;
-  padding: 0.25rem;
-  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
 }
 
 .icon-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0,0,0,0.05);
 }
 
-/* Dashboard Module */
+/* Dashboard */
 .dashboard-hero {
-  background: linear-gradient(to right, var(--primary-color), #38bdf8);
+  background: linear-gradient(to right, var(--primary-color), var(--flight-color));
   color: white;
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--shadow-lg);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 2rem;
+  text-align: left;
 }
 
 .hero-title {
-  font-size: 1.875rem;
-  font-weight: bold;
+  font-size: 2rem;
+  font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
 .hero-subtitle {
+  font-size: 1.25rem;
   opacity: 0.9;
   margin-bottom: 1rem;
 }
 
 .hero-text {
-  font-size: 0.875rem;
+  font-size: 1rem;
   opacity: 0.8;
 }
 
-.module-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-.module-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.module-card-header {
-  padding: 0.75rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Module styling */
-[data-module-type="weather"] .module-card-header {
-  background-color: var(--weather-color);
-  color: white;
-  border-top: 4px solid var(--weather-color);
-}
-
-[data-module-type="country"] .module-card-header {
-  background-color: var(--country-color);
-  color: white;
-  border-top: 4px solid var(--country-color);
-}
-
-[data-module-type="currency"] .module-card-header {
-  background-color: var(--currency-color);
-  color: white;
-  border-top: 4px solid var(--currency-color);
-}
-
-[data-module-type="news"] .module-card-header {
-  background-color: var(--news-color);
-  color: white;
-  border-top: 4px solid var(--news-color);
-}
-
-[data-module-type="flight"] .module-card-header {
-  background-color: var(--flight-color);
-  color: white;
-  border-top: 4px solid var(--flight-color);
-}
-
-.module-card-content {
-  padding: 1rem;
-  text-align: center;
-}
-
-.module-icon {
-  font-size: 3rem;
-  margin-bottom: 0.75rem;
-  color: var(--text-secondary);
-}
-
-.weather-icon {
-  color: var(--weather-color);
-}
-
-.country-icon {
-  color: var(--country-color);
-}
-
-.currency-icon {
-  color: var(--currency-color);
-}
-
-.news-icon {
-  color: var(--news-color);
-}
-
-.flight-icon {
-  color: var(--flight-color);
-}
-
-.module-description {
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-}
-
-.module-count {
-  font-weight: 600;
-  margin-top: 0.5rem;
-}
-
-/* Module specific styles - Weather */
+/* Weather Cards */
 .weather-display {
   display: flex;
   align-items: center;
@@ -386,151 +435,137 @@ body {
 
 .weather-icon {
   font-size: 2.5rem;
+  color: var(--weather-color);
 }
 
 .temperature {
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 700;
 }
 
-.condition {
-  color: var(--text-secondary);
-}
-
-/* Module specific styles - Country */
+/* Country Cards */
 .info-grid {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
 }
 
 .info-label {
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .tags-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-top: 0.5rem;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .tag {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
   font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--country-color);
-  border: 1px solid var(--country-color);
-  border-radius: var(--radius-sm);
 }
 
-/* Module specific styles - Currency */
+/* Currency Cards */
 .exchange-rate-display {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .rate-info {
   font-size: 1.25rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .converter {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.amount-input {
-  width: 6rem;
-}
-
-.converted-amount {
-  font-weight: bold;
+.converter input {
+  width: 100px;
+  text-align: right;
 }
 
 .last-updated {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--muted-color);
 }
 
-/* Module specific styles - News */
+/* News Cards */
 .news-meta {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   margin-bottom: 0.5rem;
 }
 
 .news-source {
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .news-category {
+  background-color: var(--news-color);
+  color: white;
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
   font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  background-color: rgba(139, 92, 246, 0.1);
-  color: var(--news-color);
-  border: 1px solid var(--news-color);
-  border-radius: var(--radius-sm);
 }
 
 .news-snippet {
-  margin-bottom: 0.75rem;
-  line-height: 1.5;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
 .news-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
 .published-date {
-  color: var(--text-secondary);
+  color: var(--muted-color);
 }
 
 .save-article-button {
+  background-color: var(--news-color);
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  background: none;
-  color: var(--news-color);
-  border: 1px solid var(--news-color);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .save-article-button:hover {
-  background-color: rgba(139, 92, 246, 0.1);
+  opacity: 0.9;
 }
 
-/* Module specific styles - Flight */
-.flight-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
+/* Flight Cards */
 .route-info {
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .origin-destination {
-  font-weight: 500;
+  font-size: 1.25rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.25rem;
 }
 
 .date-info {
-  color: var(--text-secondary);
+  font-size: 0.875rem;
+  color: var(--muted-color);
+  margin-top: 0.25rem;
 }
 
 .flight-details {
@@ -540,24 +575,25 @@ body {
 }
 
 .price {
-  font-size: 1.25rem;
-  font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--flight-color);
 }
 
 .airline {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  color: var(--flight-color);
+  gap: 0.5rem;
+  color: var(--muted-color);
 }
 
-/* Flight search form */
+/* Flight Form */
 .flight-search-form {
+  margin-bottom: 2rem;
   background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 1rem;
-  margin-bottom: 1.5rem;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
 }
 
 .form-row {
@@ -572,32 +608,97 @@ body {
 
 .form-group label {
   display: block;
-  font-size: 0.875rem;
-  margin-bottom: 0.25rem;
-  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
 }
 
-.wide-button {
-  width: 100%;
-  margin-top: 1.5rem;
+/* Currency Inputs */
+.currency-inputs {
+  display: flex;
+  gap: 1rem;
 }
 
-/* Responsive Styles */
+.select-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+/* Search Results */
+#country-search-results {
+  margin-top: 2rem;
+}
+
+.results-header {
+  margin-bottom: 1rem;
+}
+
+.tabs {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.tabs-list {
+  display: flex;
+  list-style: none;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab-item {
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.tab-item:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+.tab-item.active {
+  background-color: white;
+  border-bottom: 2px solid var(--primary-color);
+  font-weight: 600;
+}
+
+.tab-pane {
+  display: none;
+  padding: 1.5rem;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
+  .tabs-list {
+    overflow-x: auto;
+    white-space: nowrap;
   }
   
-  .sidebar {
-    width: 100%;
-    height: auto;
+  .tab-item span {
+    display: none;
   }
   
   .form-row {
     flex-direction: column;
   }
   
-  .module-grid {
-    grid-templates-columns: 1fr;
+  .card-grid, .module-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .input-container {
+    flex-direction: column;
   }
 }

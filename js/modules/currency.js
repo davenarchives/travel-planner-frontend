@@ -1,26 +1,9 @@
 
-import { getTemplate } from '../templates.js';
+import { currencyAPI } from '../api/currencyAPI.js';
+import { getTemplate } from '../utils/templatesUtil.js';
 
 export const currencyModule = {
-  // Mock data for currency pairs
-  currencyData: [
-    {
-      fromCurrency: 'USD',
-      toCurrency: 'EUR',
-      rate: 0.91
-    },
-    {
-      fromCurrency: 'EUR',
-      toCurrency: 'JPY',
-      rate: 161.85
-    },
-    {
-      fromCurrency: 'GBP',
-      toCurrency: 'USD',
-      rate: 1.25
-    }
-  ],
-  
+  // Initialize the currency module
   init(container) {
     // Create the currency module view
     const template = getTemplate('currency-template');
@@ -33,6 +16,7 @@ export const currencyModule = {
     this.setupEventListeners();
   },
   
+  // Set up event listeners for the currency module
   setupEventListeners() {
     // Add currency pair button
     const addCurrencyPairBtn = document.getElementById('add-currency-pair-btn');
@@ -40,7 +24,7 @@ export const currencyModule = {
       addCurrencyPairBtn.addEventListener('click', () => {
         const fromCurrency = document.getElementById('from-currency').value;
         const toCurrency = document.getElementById('to-currency').value;
-        this.addCurrencyCard(fromCurrency, toCurrency);
+        this.addCurrencyPair(fromCurrency, toCurrency);
       });
     }
     
@@ -58,86 +42,102 @@ export const currencyModule = {
     });
   },
   
+  // Load initial currency data
   loadCurrencyData() {
-    this.currencyData.forEach(currency => {
-      this.addCurrencyCard(currency.fromCurrency, currency.toCurrency, currency.rate);
+    // Initial currency pairs to load
+    const currencyPairs = [
+      { from: 'USD', to: 'EUR' },
+      { from: 'EUR', to: 'JPY' },
+      { from: 'GBP', to: 'USD' }
+    ];
+    
+    // Get data for each currency pair
+    currencyPairs.forEach(pair => {
+      this.addCurrencyPair(pair.from, pair.to);
     });
   },
   
-  addCurrencyCard(fromCurrency, toCurrency, rate) {
+  // Add a currency pair
+  addCurrencyPair(fromCurrency, toCurrency) {
     const currencyCards = document.getElementById('currency-cards');
     if (!currencyCards) return;
     
-    // Generate random rate if not provided
-    rate = rate || parseFloat((Math.random() * (1.5 - 0.5) + 0.5).toFixed(4));
-    
-    const template = getTemplate('currency-card-template');
-    const card = template.querySelector('.currency-card');
-    
-    card.dataset.rate = rate;
-    template.querySelector('.card-title').textContent = `${fromCurrency} to ${toCurrency}`;
-    
-    const symbols = {
-      'USD': '$',
-      'EUR': '€',
-      'JPY': '¥',
-      'GBP': '£',
-      'CAD': 'C$',
-      'AUD': 'A$',
-      'CNY': '¥',
-      'INR': '₹'
-    };
-    
-    template.querySelector('.rate-info').textContent = `${symbols[fromCurrency] || fromCurrency}1 = ${symbols[toCurrency] || toCurrency}${rate.toFixed(4)}`;
-    template.querySelector('.from-currency-code').textContent = fromCurrency;
-    template.querySelector('.to-currency-code').textContent = toCurrency;
-    
-    const amount = 100;
-    const convertedAmount = (amount * rate).toFixed(2);
-    template.querySelector('.converted-amount').textContent = convertedAmount;
-    
-    template.querySelector('.last-updated').textContent = `Last updated: ${new Date().toLocaleString()}`;
-    
-    // Add the card to the grid
-    currencyCards.appendChild(template);
+    // Get exchange rate from API
+    currencyAPI.getExchangeRate(fromCurrency, toCurrency)
+      .then(rate => {
+        const card = document.importNode(document.getElementById('currency-card-template').content, true);
+        const cardElement = card.querySelector('.currency-card');
+        
+        cardElement.dataset.rate = rate;
+        card.querySelector('.card-title').textContent = `${fromCurrency} to ${toCurrency}`;
+        
+        const symbols = {
+          'USD': '$',
+          'EUR': '€',
+          'JPY': '¥',
+          'GBP': '£',
+          'CAD': 'C$',
+          'AUD': 'A$',
+          'CNY': '¥',
+          'INR': '₹'
+        };
+        
+        card.querySelector('.rate-info').textContent = `${symbols[fromCurrency] || fromCurrency}1 = ${symbols[toCurrency] || toCurrency}${rate.toFixed(4)}`;
+        card.querySelector('.from-currency-code').textContent = fromCurrency;
+        card.querySelector('.to-currency-code').textContent = toCurrency;
+        
+        const amount = 100;
+        const convertedAmount = (amount * rate).toFixed(2);
+        card.querySelector('.converted-amount').textContent = convertedAmount;
+        
+        card.querySelector('.last-updated').textContent = `Last updated: ${new Date().toLocaleString()}`;
+        
+        currencyCards.appendChild(card);
+      })
+      .catch(error => {
+        console.error('Error loading exchange rate:', error);
+      });
   },
   
+  // Handle delete button click
   handleDelete(card) {
-    // In a real app, this would call an API to delete the data
     card.remove();
-    console.log('Currency card deleted');
   },
   
+  // Handle edit button click
   handleEdit(card) {
-    // In a real app, this would open an edit form
-    const currency = card.querySelector('.card-title').textContent;
-    console.log(`Editing currency card for ${currency}`);
-    
-    // Simple demonstration - update exchange rate
-    const rate = (Math.random() * (1.5 - 0.5) + 0.5).toFixed(4);
-    card.dataset.rate = rate;
-    
+    // Update the exchange rate
     const fromCurrency = card.querySelector('.from-currency-code').textContent;
     const toCurrency = card.querySelector('.to-currency-code').textContent;
     
-    const symbols = {
-      'USD': '$',
-      'EUR': '€',
-      'JPY': '¥',
-      'GBP': '£',
-      'CAD': 'C$',
-      'AUD': 'A$',
-      'CNY': '¥',
-      'INR': '₹'
-    };
-    
-    card.querySelector('.rate-info').textContent = `${symbols[fromCurrency] || fromCurrency}1 = ${symbols[toCurrency] || toCurrency}${rate}`;
-    card.querySelector('.last-updated').textContent = `Last updated: ${new Date().toLocaleString()}`;
-    
-    // Update converted amount based on current input value
-    const amountInput = card.querySelector('.amount-input');
-    const amount = parseFloat(amountInput.value) || 0;
-    const convertedAmount = (amount * parseFloat(rate)).toFixed(2);
-    card.querySelector('.converted-amount').textContent = convertedAmount;
+    // Get fresh exchange rate
+    currencyAPI.getExchangeRate(fromCurrency, toCurrency)
+      .then(rate => {
+        card.dataset.rate = rate;
+        
+        const symbols = {
+          'USD': '$',
+          'EUR': '€',
+          'JPY': '¥',
+          'GBP': '£',
+          'CAD': 'C$',
+          'AUD': 'A$',
+          'CNY': '¥',
+          'INR': '₹'
+        };
+        
+        card.querySelector('.rate-info').textContent = `${symbols[fromCurrency] || fromCurrency}1 = ${symbols[toCurrency] || toCurrency}${rate.toFixed(4)}`;
+        
+        // Update converted amount based on current input value
+        const amountInput = card.querySelector('.amount-input');
+        const amount = parseFloat(amountInput.value) || 0;
+        const convertedAmount = (amount * rate).toFixed(2);
+        card.querySelector('.converted-amount').textContent = convertedAmount;
+        
+        card.querySelector('.last-updated').textContent = `Last updated: ${new Date().toLocaleString()}`;
+      })
+      .catch(error => {
+        console.error('Error updating exchange rate:', error);
+      });
   }
 };
