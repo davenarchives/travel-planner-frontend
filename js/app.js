@@ -1,3 +1,4 @@
+
 // Import API modules
 import { weatherAPI } from './api/weatherAPI.js';
 import { countryAPI } from './api/countryAPI.js';
@@ -12,6 +13,7 @@ import { countryModule } from './modules/country.js';
 import { currencyModule } from './modules/currency.js';
 import { newsModule } from './modules/news.js';
 import { flightModule } from './modules/flight.js';
+import { bookmarksModule } from './modules/bookmarks.js';
 
 // Import utility functions
 import { loadTemplates, getTemplate } from './utils/templatesUtil.js';
@@ -120,7 +122,8 @@ const modules = {
   'country': countryModule,
   'currency': currencyModule,
   'news': newsModule,
-  'flight': flightModule
+  'flight': flightModule,
+  'bookmarks': bookmarksModule
 };
 
 // Load a specific module
@@ -145,7 +148,8 @@ function loadModule(moduleId) {
     'country': 'Country Explorer',
     'currency': 'Currency Conversion',
     'news': 'Travel News',
-    'flight': 'Flight Search'
+    'flight': 'Flight Search',
+    'bookmarks': 'Bookmarked Flights'
   };
   
   const moduleDescriptions = {
@@ -154,7 +158,8 @@ function loadModule(moduleId) {
     'country': 'Explore information about countries',
     'currency': 'Convert between different currencies',
     'news': 'Stay updated with travel news',
-    'flight': 'Find and save flight options'
+    'flight': 'Find and save flight options',
+    'bookmarks': 'View your bookmarked flights'
   };
   
   moduleTitle.textContent = moduleTitles[moduleId];

@@ -11,7 +11,6 @@ export const flightModule = {
     
     // Load initial data
     this.loadFlightData();
-    this.loadBookmarkedFlights();
     
     // Set up event listeners
     this.setupEventListeners();
@@ -57,21 +56,6 @@ export const flightModule = {
       });
     }
     
-    // Tab navigation
-    const tabButtons = document.querySelectorAll('.tab-button');
-    tabButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        // Remove active class from all tabs and views
-        tabButtons.forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.flight-view').forEach(view => view.classList.remove('active'));
-        
-        // Add active class to clicked tab and corresponding view
-        button.classList.add('active');
-        const viewId = button.dataset.view + '-view';
-        document.getElementById(viewId).classList.add('active');
-      });
-    });
-    
     // Global event delegation for bookmarking flights
     document.addEventListener('click', e => {
       if (e.target.closest('.bookmark-button')) {
@@ -106,38 +90,6 @@ export const flightModule = {
       })
       .catch(error => {
         console.error('Error loading flight data:', error);
-      });
-  },
-  
-  // Load bookmarked flights
-  loadBookmarkedFlights() {
-    const bookmarksContainer = document.getElementById('bookmarked-flight-cards');
-    if (!bookmarksContainer) return;
-    
-    // Clear container
-    bookmarksContainer.innerHTML = '';
-    
-    flightAPI.getBookmarkedFlights()
-      .then(bookmarkedFlights => {
-        if (bookmarkedFlights.length === 0) {
-          // Show empty state
-          const emptyState = document.createElement('div');
-          emptyState.className = 'empty-bookmarks';
-          emptyState.innerHTML = `
-            <i class="fas fa-bookmark"></i>
-            <p>No bookmarked flights yet</p>
-            <span>Your bookmarked flights will appear here</span>
-          `;
-          bookmarksContainer.appendChild(emptyState);
-        } else {
-          // Add bookmarked flights
-          bookmarkedFlights.forEach(flight => {
-            this.addFlightCard(flight, false, bookmarksContainer, true);
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error loading bookmarked flights:', error);
       });
   },
   
@@ -254,7 +206,7 @@ export const flightModule = {
     
     // Add to top of list for search results, otherwise add to end
     if (prepend) {
-      flightCards.appendChild(card);
+      flightCards.prepend(card);
     } else {
       flightCards.appendChild(card);
     }
@@ -263,8 +215,6 @@ export const flightModule = {
   // Bookmark a flight
   bookmarkFlight(flight) {
     flightAPI.bookmarkFlight(flight).then(() => {
-      this.loadBookmarkedFlights();
-      
       // Show toast notification
       this.showToast(`Flight from ${flight.origin} to ${flight.destination} has been bookmarked!`);
     });
@@ -273,8 +223,6 @@ export const flightModule = {
   // Remove a flight from bookmarks
   removeBookmark(flightId) {
     flightAPI.removeBookmark(flightId).then(() => {
-      this.loadBookmarkedFlights();
-      
       // Update the bookmark button in search view if applicable
       const searchViewCard = document.querySelector(`#flight-cards [data-flight-id="${flightId}"]`);
       if (searchViewCard) {
@@ -289,9 +237,6 @@ export const flightModule = {
     
     flightAPI.deleteFlight(flightId).then(() => {
       card.remove();
-      
-      // If it was a bookmarked flight, refresh bookmarks
-      this.loadBookmarkedFlights();
       
       // If we're removing a search result and there are no more, remove the heading too
       const flightCards = document.getElementById('flight-cards');
