@@ -39,3 +39,82 @@
 <div class="card-grid" id="flight-cards">
   <!-- Flight cards will be added here -->
 </div>
+
+<style>
+  /* Tab styles */
+  .tabs-container {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .tabs-header {
+    display: flex;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+  }
+  
+  .tab-button {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #64748b;
+    transition: all 0.2s ease;
+  }
+  
+  .tab-button.active {
+    border-bottom: 2px solid #3b82f6;
+    color: #3b82f6;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  /* Bookmark styles */
+  .bookmarked {
+    color: #3b82f6;
+  }
+  
+  .no-bookmarks-message {
+    padding: 20px;
+    text-align: center;
+    color: #64748b;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
+  }
+  
+  /* Search results heading */
+  .search-results-heading {
+    margin-bottom: 16px;
+    padding: 12px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+  }
+  
+  .search-results-heading h3 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .search-results-heading p {
+    margin: 0;
+    font-size: 14px;
+    color: #64748b;
+  }
+</style>
