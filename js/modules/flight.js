@@ -55,27 +55,6 @@ export const flightModule = {
         returnDateInput.min = this.value;
       });
     }
-    
-    // Global event delegation for bookmarking flights
-    document.addEventListener('click', e => {
-      if (e.target.closest('.bookmark-button')) {
-        const button = e.target.closest('.bookmark-button');
-        const card = button.closest('.flight-card');
-        
-        // Toggle bookmarked state visually
-        button.classList.toggle('active');
-        
-        // Get flight data from the card
-        const flight = this.getFlightDataFromCard(card);
-        
-        // If button has active class, bookmark the flight
-        if (button.classList.contains('active')) {
-          this.bookmarkFlight(flight);
-        } else {
-          this.removeBookmark(flight.id);
-        }
-      }
-    });
   },
   
   // Load initial flight data
@@ -103,9 +82,6 @@ export const flightModule = {
       .then(results => {
         // Add new search results at the top
         if (results.length > 0) {
-          // Clear existing cards
-          flightCards.innerHTML = '';
-          
           // Add a heading for search results
           const searchResultsHeading = document.createElement('div');
           searchResultsHeading.className = 'search-results-heading';
@@ -113,7 +89,7 @@ export const flightModule = {
             <h3>Search Results: ${results.length} flights found</h3>
             <p>${origin} to ${destination} on ${new Date(departureDate).toLocaleDateString()}</p>
           `;
-          flightCards.appendChild(searchResultsHeading);
+          flightCards.insertBefore(searchResultsHeading, flightCards.firstChild);
           
           // Add flight results
           results.forEach(flight => {
@@ -126,51 +102,12 @@ export const flightModule = {
       });
   },
   
-  // Extract flight data from a card element
-  getFlightDataFromCard(card) {
-    const id = card.dataset.flightId || `flight-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    const title = card.querySelector('.card-title').textContent;
-    const origin = card.querySelector('.origin').textContent;
-    const destination = card.querySelector('.destination').textContent;
-    const dateInfo = card.querySelector('.date-info').textContent;
-    const price = card.querySelector('.price').textContent;
-    const airline = card.querySelector('.airline-name').textContent;
-    
-    // Parse dates from date info
-    let departureDate = '';
-    let returnDate = '';
-    
-    const departMatch = dateInfo.match(/Depart: ([^·]+)/);
-    if (departMatch) {
-      departureDate = departMatch[1].trim();
-    }
-    
-    const returnMatch = dateInfo.match(/Return: ([^·]+)/);
-    if (returnMatch) {
-      returnDate = returnMatch[1].trim();
-    }
-    
-    return {
-      id,
-      origin,
-      destination,
-      departureDate,
-      returnDate,
-      price,
-      airline
-    };
-  },
-  
   // Add a flight card
-  addFlightCard(flight, prepend = false, container = null, isBookmarked = false) {
-    const flightCards = container || document.getElementById('flight-cards');
+  addFlightCard(flight, prepend = false) {
+    const flightCards = document.getElementById('flight-cards');
     if (!flightCards) return;
     
     const card = document.importNode(document.getElementById('flight-card-template').content, true);
-    const cardElement = card.querySelector('.flight-card');
-    
-    // Store flight ID on the card element for easy retrieval
-    cardElement.dataset.flightId = flight.id;
     
     card.querySelector('.card-title').textContent = `Flight ${flight.origin} - ${flight.destination}`;
     card.querySelector('.origin').textContent = flight.origin;
@@ -189,82 +126,36 @@ export const flightModule = {
     card.querySelector('.price').textContent = flight.price;
     card.querySelector('.airline-name').textContent = flight.airline;
     
-    // Check if this flight is bookmarked and update the bookmark button
-    if (isBookmarked) {
-      card.querySelector('.bookmark-button').classList.add('active');
-    } else {
-      // If not already set, check against local storage
-      flightAPI.isFlightBookmarked(flight.id).then(isBookmarked => {
-        if (isBookmarked) {
-          const addedCard = flightCards.querySelector(`[data-flight-id="${flight.id}"]`);
-          if (addedCard) {
-            addedCard.querySelector('.bookmark-button').classList.add('active');
-          }
-        }
-      });
-    }
-    
     // Add to top of list for search results, otherwise add to end
     if (prepend) {
-      flightCards.prepend(card);
+      flightCards.insertBefore(card, flightCards.firstChild.nextSibling); // After the heading
     } else {
       flightCards.appendChild(card);
     }
   },
   
-  // Bookmark a flight
-  bookmarkFlight(flight) {
-    flightAPI.bookmarkFlight(flight).then(() => {
-      // Show toast notification
-      this.showToast(`Flight from ${flight.origin} to ${flight.destination} has been bookmarked!`);
-    });
-  },
-  
-  // Remove a flight from bookmarks
-  removeBookmark(flightId) {
-    flightAPI.removeBookmark(flightId).then(() => {
-      // Update the bookmark button in search view if applicable
-      const searchViewCard = document.querySelector(`#flight-cards [data-flight-id="${flightId}"]`);
-      if (searchViewCard) {
-        searchViewCard.querySelector('.bookmark-button').classList.remove('active');
-      }
-    });
-  },
-  
   // Handle delete button click
   handleDelete(card) {
-    const flightId = card.dataset.flightId;
+    card.remove();
     
-    flightAPI.deleteFlight(flightId).then(() => {
-      card.remove();
-      
-      // If we're removing a search result and there are no more, remove the heading too
-      const flightCards = document.getElementById('flight-cards');
-      const searchResultsHeading = flightCards.querySelector('.search-results-heading');
-      
-      if (searchResultsHeading && !searchResultsHeading.nextElementSibling) {
-        searchResultsHeading.remove();
-      }
-    });
+    // If we're removing a search result and there are no more, remove the heading too
+    const flightCards = document.getElementById('flight-cards');
+    const searchResultsHeading = flightCards.querySelector('.search-results-heading');
+    
+    if (searchResultsHeading && !searchResultsHeading.nextElementSibling) {
+      searchResultsHeading.remove();
+    }
   },
   
-  // Show a toast notification
-  showToast(message) {
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
+  // Handle edit button click
+  handleEdit(card) {
+    // Toggle "Saved" label
+    const title = card.querySelector('.card-title');
     
-    // Show the toast
-    setTimeout(() => {
-      toast.classList.add('show');
-      
-      // Hide and remove the toast after 3 seconds
-      setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }, 100);
+    if (title.textContent.includes('[Saved]')) {
+      title.textContent = title.textContent.replace(' [Saved]', '');
+    } else {
+      title.textContent = `${title.textContent} [Saved]`;
+    }
   }
 };
