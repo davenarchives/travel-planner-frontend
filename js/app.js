@@ -13,27 +13,107 @@ import { countryModule } from './modules/country.js';
 import { currencyModule } from './modules/currency.js';
 import { newsModule } from './modules/news.js';
 import { flightModule } from './modules/flight.js';
+import { bookmarksModule } from './modules/bookmarks.js';
 
 // Import utility functions
 import { loadTemplates, getTemplate } from './utils/templatesUtil.js';
+
+// Check if user is logged in
+function checkUserLogin() {
+  return localStorage.getItem('isLoggedIn') === 'true';
+}
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
   // Load all HTML templates
   loadTemplates().then(() => {
-    // Load initial module
-    loadModule('dashboard');
-    
-    // Add event listeners to sidebar menu items
-    setupNavigation();
-    
-    // Global event delegation for card actions
-    setupEventDelegation();
-    
-    // Set up country search functionality
-    setupCountrySearch();
+    // Check if user is logged in
+    if (checkUserLogin()) {
+      showApp();
+    } else {
+      showLoginForm();
+    }
   });
 });
+
+// Show login form
+function showLoginForm() {
+  const loginContainer = document.getElementById('login-container');
+  const appContainer = document.getElementById('app-container');
+  
+  loginContainer.classList.remove('hidden');
+  appContainer.classList.add('hidden');
+  
+  // Set up login button handler
+  const loginButton = document.getElementById('login-button');
+  loginButton.addEventListener('click', handleLogin);
+  
+  // Handle Enter key press in login form
+  const passwordInput = document.getElementById('password');
+  passwordInput.addEventListener('keyup', function(event) {
+    if (event.key === 'Enter') {
+      handleLogin();
+    }
+  });
+}
+
+// Handle login attempt
+function handleLogin() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const loginError = document.getElementById('login-error');
+  
+  // Check against hardcoded credentials
+  if (username === 'user' && password === 'travel123') {
+    // Store login state in localStorage
+    localStorage.setItem('isLoggedIn', 'true');
+    showApp();
+  } else {
+    // Show error message
+    loginError.classList.remove('hidden');
+    
+    // Clear password field
+    document.getElementById('password').value = '';
+  }
+}
+
+// Show the main application
+function showApp() {
+  const loginContainer = document.getElementById('login-container');
+  const appContainer = document.getElementById('app-container');
+  
+  loginContainer.classList.add('hidden');
+  appContainer.classList.remove('hidden');
+  
+  // Load initial module
+  loadModule('dashboard');
+  
+  // Add event listeners to sidebar menu items
+  setupNavigation();
+  
+  // Global event delegation for card actions
+  setupEventDelegation();
+  
+  // Set up country search functionality
+  setupCountrySearch();
+  
+  // Set up logout button
+  setupLogout();
+}
+
+// Set up logout functionality
+function setupLogout() {
+  const logoutButton = document.getElementById('logout-button');
+  if (logoutButton) {
+    logoutButton.addEventListener('click', function() {
+      // Clear login state
+      localStorage.removeItem('isLoggedIn');
+      
+      // Show login form
+      showLoginForm();
+    });
+  }
+}
 
 // Module mapping
 const modules = {
@@ -42,7 +122,8 @@ const modules = {
   'country': countryModule,
   'currency': currencyModule,
   'news': newsModule,
-  'flight': flightModule
+  'flight': flightModule,
+  'bookmarks': bookmarksModule
 };
 
 // Load a specific module
@@ -67,7 +148,8 @@ function loadModule(moduleId) {
     'country': 'Country Explorer',
     'currency': 'Currency Conversion',
     'news': 'Travel News',
-    'flight': 'Flight Search'
+    'flight': 'Flight Search',
+    'bookmarks': 'Bookmarked Flights'
   };
   
   const moduleDescriptions = {
@@ -76,7 +158,8 @@ function loadModule(moduleId) {
     'country': 'Explore information about countries',
     'currency': 'Convert between different currencies',
     'news': 'Stay updated with travel news',
-    'flight': 'Find and save flight options'
+    'flight': 'Find and save flight options',
+    'bookmarks': 'View your bookmarked flights'
   };
   
   moduleTitle.textContent = moduleTitles[moduleId];
@@ -124,16 +207,6 @@ function setupEventDelegation() {
         modules[moduleId].handleDelete(card);
       } else {
         card.remove();
-      }
-    }
-    
-    // Handle edit button clicks
-    if (target.closest('.edit-button')) {
-      const card = target.closest('.card');
-      const moduleId = getCurrentModule();
-      
-      if (modules[moduleId] && modules[moduleId].handleEdit) {
-        modules[moduleId].handleEdit(card);
       }
     }
     
