@@ -62,11 +62,49 @@ export const flightAPI = {
   
   // Get all saved flights
   async getAllFlights() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(this.mockFlightData);
-      }, 300);
-    });
+    // Check if we have saved flights in localStorage
+    const savedFlights = localStorage.getItem('savedFlights');
+    if (savedFlights) {
+      return JSON.parse(savedFlights);
+    }
+    
+    // If not, save the mock data to localStorage and return it
+    localStorage.setItem('savedFlights', JSON.stringify(this.mockFlightData));
+    return this.mockFlightData;
+  },
+  
+  // Get all bookmarked flights
+  async getBookmarkedFlights() {
+    const bookmarkedFlights = localStorage.getItem('bookmarkedFlights');
+    return bookmarkedFlights ? JSON.parse(bookmarkedFlights) : [];
+  },
+  
+  // Save a flight to bookmarks
+  async bookmarkFlight(flight) {
+    let bookmarkedFlights = await this.getBookmarkedFlights();
+    
+    // Check if flight is already bookmarked (avoid duplicates)
+    const isAlreadyBookmarked = bookmarkedFlights.some(f => f.id === flight.id);
+    if (!isAlreadyBookmarked) {
+      bookmarkedFlights.push(flight);
+      localStorage.setItem('bookmarkedFlights', JSON.stringify(bookmarkedFlights));
+    }
+    
+    return bookmarkedFlights;
+  },
+  
+  // Remove a flight from bookmarks
+  async removeBookmark(flightId) {
+    let bookmarkedFlights = await this.getBookmarkedFlights();
+    bookmarkedFlights = bookmarkedFlights.filter(f => f.id !== flightId);
+    localStorage.setItem('bookmarkedFlights', JSON.stringify(bookmarkedFlights));
+    return bookmarkedFlights;
+  },
+  
+  // Check if a flight is bookmarked
+  async isFlightBookmarked(flightId) {
+    const bookmarkedFlights = await this.getBookmarkedFlights();
+    return bookmarkedFlights.some(f => f.id === flightId);
   },
   
   // Search for flights
@@ -110,9 +148,31 @@ export const flightAPI = {
           });
         }
         
+        // Save search results to local storage
+        const savedFlights = localStorage.getItem('savedFlights') 
+          ? JSON.parse(localStorage.getItem('savedFlights')) 
+          : this.mockFlightData;
+        
+        localStorage.setItem('savedFlights', JSON.stringify([...savedFlights, ...results]));
+        
         resolve(results);
       }, 300);
     });
+  },
+  
+  // Delete a flight
+  async deleteFlight(flightId) {
+    let savedFlights = localStorage.getItem('savedFlights') 
+      ? JSON.parse(localStorage.getItem('savedFlights'))
+      : this.mockFlightData;
+    
+    savedFlights = savedFlights.filter(flight => flight.id !== flightId);
+    localStorage.setItem('savedFlights', JSON.stringify(savedFlights));
+    
+    // Also remove from bookmarks if it was bookmarked
+    await this.removeBookmark(flightId);
+    
+    return savedFlights;
   },
   
   // Get flights by destination

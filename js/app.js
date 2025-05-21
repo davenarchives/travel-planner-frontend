@@ -1,4 +1,3 @@
-
 // Import API modules
 import { weatherAPI } from './api/weatherAPI.js';
 import { countryAPI } from './api/countryAPI.js';
@@ -17,23 +16,102 @@ import { flightModule } from './modules/flight.js';
 // Import utility functions
 import { loadTemplates, getTemplate } from './utils/templatesUtil.js';
 
+// Check if user is logged in
+function checkUserLogin() {
+  return localStorage.getItem('isLoggedIn') === 'true';
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
   // Load all HTML templates
   loadTemplates().then(() => {
-    // Load initial module
-    loadModule('dashboard');
-    
-    // Add event listeners to sidebar menu items
-    setupNavigation();
-    
-    // Global event delegation for card actions
-    setupEventDelegation();
-    
-    // Set up country search functionality
-    setupCountrySearch();
+    // Check if user is logged in
+    if (checkUserLogin()) {
+      showApp();
+    } else {
+      showLoginForm();
+    }
   });
 });
+
+// Show login form
+function showLoginForm() {
+  const loginContainer = document.getElementById('login-container');
+  const appContainer = document.getElementById('app-container');
+  
+  loginContainer.classList.remove('hidden');
+  appContainer.classList.add('hidden');
+  
+  // Set up login button handler
+  const loginButton = document.getElementById('login-button');
+  loginButton.addEventListener('click', handleLogin);
+  
+  // Handle Enter key press in login form
+  const passwordInput = document.getElementById('password');
+  passwordInput.addEventListener('keyup', function(event) {
+    if (event.key === 'Enter') {
+      handleLogin();
+    }
+  });
+}
+
+// Handle login attempt
+function handleLogin() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const loginError = document.getElementById('login-error');
+  
+  // Check against hardcoded credentials
+  if (username === 'user' && password === 'travel123') {
+    // Store login state in localStorage
+    localStorage.setItem('isLoggedIn', 'true');
+    showApp();
+  } else {
+    // Show error message
+    loginError.classList.remove('hidden');
+    
+    // Clear password field
+    document.getElementById('password').value = '';
+  }
+}
+
+// Show the main application
+function showApp() {
+  const loginContainer = document.getElementById('login-container');
+  const appContainer = document.getElementById('app-container');
+  
+  loginContainer.classList.add('hidden');
+  appContainer.classList.remove('hidden');
+  
+  // Load initial module
+  loadModule('dashboard');
+  
+  // Add event listeners to sidebar menu items
+  setupNavigation();
+  
+  // Global event delegation for card actions
+  setupEventDelegation();
+  
+  // Set up country search functionality
+  setupCountrySearch();
+  
+  // Set up logout button
+  setupLogout();
+}
+
+// Set up logout functionality
+function setupLogout() {
+  const logoutButton = document.getElementById('logout-button');
+  if (logoutButton) {
+    logoutButton.addEventListener('click', function() {
+      // Clear login state
+      localStorage.removeItem('isLoggedIn');
+      
+      // Show login form
+      showLoginForm();
+    });
+  }
+}
 
 // Module mapping
 const modules = {
@@ -124,16 +202,6 @@ function setupEventDelegation() {
         modules[moduleId].handleDelete(card);
       } else {
         card.remove();
-      }
-    }
-    
-    // Handle edit button clicks
-    if (target.closest('.edit-button')) {
-      const card = target.closest('.card');
-      const moduleId = getCurrentModule();
-      
-      if (modules[moduleId] && modules[moduleId].handleEdit) {
-        modules[moduleId].handleEdit(card);
       }
     }
     
