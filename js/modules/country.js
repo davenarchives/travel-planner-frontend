@@ -76,6 +76,21 @@ export const countryModule = {
           tagsContainer.appendChild(tagElement);
         });
         
+        // Generate a unique ID for the country
+        const countryId = `country-${country.name.toLowerCase().replace(/\s/g, '-')}-${Date.now()}`;
+        const countryCard = card.querySelector('.card');
+        countryCard.dataset.countryId = countryId;
+        
+        // Check if already bookmarked
+        const bookmarkedCountries = JSON.parse(localStorage.getItem('bookmarkedCountries') || '[]');
+        const isBookmarked = bookmarkedCountries.some(c => c.name === country.name);
+        
+        if (isBookmarked) {
+          const bookmarkButton = card.querySelector('.bookmark-button');
+          bookmarkButton.classList.add('active');
+          bookmarkButton.querySelector('i').classList.add('active');
+        }
+        
         countryCards.appendChild(card);
       })
       .catch(error => {
@@ -86,18 +101,57 @@ export const countryModule = {
   // Handle delete button click
   handleDelete(card) {
     card.remove();
+    
+    // Remove from bookmarks if bookmarked
+    const countryId = card.dataset.countryId;
+    if (countryId) {
+      const bookmarkedCountries = JSON.parse(localStorage.getItem('bookmarkedCountries') || '[]');
+      const updatedBookmarks = bookmarkedCountries.filter(c => c.countryId !== countryId);
+      localStorage.setItem('bookmarkedCountries', JSON.stringify(updatedBookmarks));
+    }
   },
   
-  // Handle edit button click
-  handleEdit(card) {
-    // Add a random tag to the country card
-    const tagsContainer = card.querySelector('.tags-container');
-    const newTags = ['Favorite', 'Must Visit', 'Budget Friendly', 'Family Friendly'];
-    const randomTag = newTags[Math.floor(Math.random() * newTags.length)];
+  // Handle bookmark button click
+  handleBookmark(card) {
+    const countryId = card.dataset.countryId;
+    const nameWithFlag = card.querySelector('.card-title').textContent;
+    const nameParts = nameWithFlag.split(' ');
+    const flag = nameParts.length > 1 && nameParts[0].length <= 4 ? nameParts[0] : '';
+    const name = flag ? nameWithFlag.substring(flag.length).trim() : nameWithFlag;
+    const capital = card.querySelector('.capital').textContent;
+    const population = card.querySelector('.population').textContent;
+    const region = card.querySelector('.region').textContent;
+    const tags = Array.from(card.querySelectorAll('.tag')).map(tag => tag.textContent);
     
-    const tagElement = document.createElement('span');
-    tagElement.className = 'tag';
-    tagElement.textContent = randomTag;
-    tagsContainer.appendChild(tagElement);
+    if (!countryId) return;
+    
+    const bookmarkedCountries = JSON.parse(localStorage.getItem('bookmarkedCountries') || '[]');
+    const bookmarkButton = card.querySelector('.bookmark-button');
+    
+    // Check if already bookmarked
+    const bookmarkIndex = bookmarkedCountries.findIndex(c => c.countryId === countryId);
+    
+    if (bookmarkIndex >= 0) {
+      // Remove from bookmarks
+      bookmarkedCountries.splice(bookmarkIndex, 1);
+      bookmarkButton.classList.remove('active');
+      bookmarkButton.querySelector('i').classList.remove('active');
+    } else {
+      // Add to bookmarks
+      bookmarkedCountries.push({
+        countryId,
+        name,
+        flag,
+        capital,
+        population,
+        region,
+        tags
+      });
+      bookmarkButton.classList.add('active');
+      bookmarkButton.querySelector('i').classList.add('active');
+    }
+    
+    // Save updated bookmarks to localStorage
+    localStorage.setItem('bookmarkedCountries', JSON.stringify(bookmarkedCountries));
   }
 };

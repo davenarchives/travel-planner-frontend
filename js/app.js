@@ -22,19 +22,72 @@ import { loadTemplates, getTemplate } from './utils/templatesUtil.js';
 document.addEventListener('DOMContentLoaded', function() {
   // Load all HTML templates
   loadTemplates().then(() => {
-    // Load initial module
-    loadModule('dashboard');
-    
-    // Add event listeners to sidebar menu items
-    setupNavigation();
-    
-    // Global event delegation for card actions
-    setupEventDelegation();
-    
-    // Set up country search functionality
-    setupCountrySearch();
+    // Check if user is logged in
+    if (!isLoggedIn()) {
+      showLoginScreen();
+    } else {
+      initializeApp();
+    }
   });
 });
+
+// Check if user is logged in
+function isLoggedIn() {
+  return localStorage.getItem('isLoggedIn') === 'true';
+}
+
+// Show login screen
+function showLoginScreen() {
+  const appContainer = document.querySelector('.app-container');
+  if (!appContainer) return;
+  
+  // Hide the app content
+  appContainer.innerHTML = '';
+  
+  // Add the login template
+  const loginTemplate = getTemplate('login-template');
+  appContainer.appendChild(loginTemplate);
+  
+  // Set up login form
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      // Simple authentication (in real app, this would be server-side)
+      if (username === 'admin' && password === 'admin') {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('username', username);
+        
+        // Reload the app
+        window.location.reload();
+      } else {
+        alert('Invalid credentials. Try username: admin, password: admin');
+      }
+    });
+  }
+}
+
+// Initialize the main app
+function initializeApp() {
+  // Load initial module
+  loadModule('dashboard');
+  
+  // Add event listeners to sidebar menu items
+  setupNavigation();
+  
+  // Global event delegation for card actions
+  setupEventDelegation();
+  
+  // Set up country search functionality
+  setupCountrySearch();
+  
+  // Update bookmark count
+  updateBookmarkCount();
+}
 
 // Module mapping
 const modules = {
@@ -55,12 +108,12 @@ function loadModule(moduleId) {
   const searchResults = document.getElementById('country-search-results');
   
   // Hide search results and show module content
-  searchResults.classList.add('hidden');
-  moduleContent.classList.remove('hidden');
+  if (searchResults) searchResults.classList.add('hidden');
+  if (moduleContent) moduleContent.classList.remove('hidden');
   
   // Update active state in sidebar
   document.querySelectorAll('.sidebar-menu-button').forEach(btn => btn.classList.remove('active'));
-  document.querySelector(`[data-module="${moduleId}"] .sidebar-menu-button`).classList.add('active');
+  document.querySelector(`[data-module="${moduleId}"] .sidebar-menu-button`)?.classList.add('active');
   
   // Update title and description based on module
   const moduleTitles = {
@@ -70,7 +123,7 @@ function loadModule(moduleId) {
     'currency': 'Currency Conversion',
     'news': 'Travel News',
     'flight': 'Flight Search',
-    'bookmark': 'Bookmarked Flights'
+    'bookmark': 'Bookmarked Items'
   };
   
   const moduleDescriptions = {
@@ -80,17 +133,17 @@ function loadModule(moduleId) {
     'currency': 'Convert between different currencies',
     'news': 'Stay updated with travel news',
     'flight': 'Find and save flight options',
-    'bookmark': 'View and manage your saved flights'
+    'bookmark': 'View and manage your saved travel items'
   };
   
-  moduleTitle.textContent = moduleTitles[moduleId];
-  moduleDescription.textContent = moduleDescriptions[moduleId];
+  if (moduleTitle) moduleTitle.textContent = moduleTitles[moduleId];
+  if (moduleDescription) moduleDescription.textContent = moduleDescriptions[moduleId];
   
   // Clear module content
-  moduleContent.innerHTML = '';
+  if (moduleContent) moduleContent.innerHTML = '';
   
   // Initialize module
-  if (modules[moduleId]) {
+  if (modules[moduleId] && moduleContent) {
     modules[moduleId].init(moduleContent);
   }
 }
@@ -105,6 +158,16 @@ function setupNavigation() {
       loadModule(moduleId);
     });
   });
+  
+  // Add logout button functionality
+  const logoutButton = document.getElementById('logout-button');
+  if (logoutButton) {
+    logoutButton.addEventListener('click', function() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('username');
+      window.location.reload();
+    });
+  }
 }
 
 // Set up global event delegation
@@ -129,9 +192,11 @@ function setupEventDelegation() {
       } else {
         card.remove();
       }
+      
+      updateBookmarkCount();
     }
     
-    // Handle bookmark button clicks (replacing edit functionality)
+    // Handle bookmark button clicks (instead of edit)
     if (target.closest('.bookmark-button')) {
       const card = target.closest('.card');
       const moduleId = getCurrentModule();
@@ -139,6 +204,8 @@ function setupEventDelegation() {
       if (modules[moduleId] && modules[moduleId].handleBookmark) {
         modules[moduleId].handleBookmark(card);
       }
+      
+      updateBookmarkCount();
     }
     
     // Handle tab clicks
@@ -152,9 +219,31 @@ function setupEventDelegation() {
       
       // Add active class to selected tab and its content
       tabItem.classList.add('active');
-      document.getElementById(`${tabId}-tab`).classList.add('active');
+      document.getElementById(`${tabId}-tab`)?.classList.add('active');
     }
   });
+}
+
+// Update bookmark count in the sidebar
+function updateBookmarkCount() {
+  const bookmarkedFlights = JSON.parse(localStorage.getItem('bookmarkedFlights') || '[]');
+  const bookmarkedWeather = JSON.parse(localStorage.getItem('bookmarkedWeather') || '[]');
+  const bookmarkedCountries = JSON.parse(localStorage.getItem('bookmarkedCountries') || '[]');
+  const bookmarkedCurrencies = JSON.parse(localStorage.getItem('bookmarkedCurrencies') || '[]');
+  const bookmarkedNews = JSON.parse(localStorage.getItem('bookmarkedNews') || '[]');
+  
+  const totalCount = 
+    bookmarkedFlights.length + 
+    bookmarkedWeather.length + 
+    bookmarkedCountries.length + 
+    bookmarkedCurrencies.length + 
+    bookmarkedNews.length;
+  
+  const bookmarkCountElement = document.querySelector('[data-module="bookmark"] .sidebar-count');
+  if (bookmarkCountElement) {
+    bookmarkCountElement.textContent = totalCount;
+    bookmarkCountElement.classList.toggle('hidden', totalCount === 0);
+  }
 }
 
 // Set up country search functionality

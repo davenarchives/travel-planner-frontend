@@ -44,9 +44,23 @@ export const newsModule = {
     document.addEventListener('click', (event) => {
       if (event.target.classList.contains('save-article-button')) {
         const button = event.target;
+        const card = button.closest('.card');
+        
         button.textContent = 'Saved';
         button.disabled = true;
         button.style.opacity = '0.5';
+        
+        // Also activate the bookmark button
+        if (card) {
+          const bookmarkButton = card.querySelector('.bookmark-button');
+          if (bookmarkButton) {
+            bookmarkButton.classList.add('active');
+            bookmarkButton.querySelector('i')?.classList.add('active');
+            
+            // Trigger bookmarking
+            this.handleBookmark(card);
+          }
+        }
       }
     });
   },
@@ -114,15 +128,27 @@ export const newsModule = {
     card.querySelector('.news-snippet').textContent = article.snippet;
     card.querySelector('.published-date').textContent = `Published: ${new Date(article.publishedAt).toLocaleDateString()}`;
     
+    // Generate a unique ID for the news
+    const newsId = `news-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const newsCard = card.querySelector('.card');
+    newsCard.dataset.newsId = newsId;
+    
+    // Check if already bookmarked
+    const bookmarkedNews = JSON.parse(localStorage.getItem('bookmarkedNews') || '[]');
+    const isBookmarked = article.saved || bookmarkedNews.some(n => n.title === article.title);
+    
     // Handle saved state
-    if (article.saved) {
-      const newsCard = card.querySelector('.card');
+    if (isBookmarked) {
       newsCard.classList.add('saved');
       
       const saveButton = card.querySelector('.save-article-button');
       saveButton.textContent = 'Saved';
       saveButton.disabled = true;
       saveButton.style.opacity = '0.5';
+      
+      const bookmarkButton = card.querySelector('.bookmark-button');
+      bookmarkButton.classList.add('active');
+      bookmarkButton.querySelector('i').classList.add('active');
     }
     
     // Add to top of list for search results, otherwise add to end
@@ -136,24 +162,74 @@ export const newsModule = {
   // Handle delete button click
   handleDelete(card) {
     card.remove();
+    
+    // Remove from bookmarks if bookmarked
+    const newsId = card.dataset.newsId;
+    if (newsId) {
+      const bookmarkedNews = JSON.parse(localStorage.getItem('bookmarkedNews') || '[]');
+      const updatedBookmarks = bookmarkedNews.filter(n => n.newsId !== newsId);
+      localStorage.setItem('bookmarkedNews', JSON.stringify(updatedBookmarks));
+    }
   },
   
-  // Handle edit button click
-  handleEdit(card) {
-    // Toggle save state
-    const saveButton = card.querySelector('.save-article-button');
-    if (saveButton.disabled) {
-      // Unsave
-      saveButton.textContent = 'Save Article';
-      saveButton.disabled = false;
-      saveButton.style.opacity = '1';
+  // Handle bookmark button click
+  handleBookmark(card) {
+    const newsId = card.dataset.newsId;
+    const title = card.querySelector('.card-title').textContent;
+    const source = card.querySelector('.news-source').textContent;
+    const category = card.querySelector('.news-category').textContent;
+    const snippet = card.querySelector('.news-snippet').textContent;
+    const publishedAt = card.querySelector('.published-date').textContent.replace('Published: ', '');
+    
+    if (!newsId) return;
+    
+    const bookmarkedNews = JSON.parse(localStorage.getItem('bookmarkedNews') || '[]');
+    const bookmarkButton = card.querySelector('.bookmark-button');
+    
+    // Check if already bookmarked
+    const bookmarkIndex = bookmarkedNews.findIndex(n => n.newsId === newsId);
+    
+    if (bookmarkIndex >= 0) {
+      // Remove from bookmarks
+      bookmarkedNews.splice(bookmarkIndex, 1);
+      bookmarkButton.classList.remove('active');
+      bookmarkButton.querySelector('i').classList.remove('active');
+      
+      // Also update save button
+      const saveButton = card.querySelector('.save-article-button');
+      if (saveButton) {
+        saveButton.textContent = 'Save Article';
+        saveButton.disabled = false;
+        saveButton.style.opacity = '1';
+      }
+      
       card.classList.remove('saved');
     } else {
-      // Save
-      saveButton.textContent = 'Saved';
-      saveButton.disabled = true;
-      saveButton.style.opacity = '0.5';
+      // Add to bookmarks
+      bookmarkedNews.push({
+        newsId,
+        title,
+        source,
+        category,
+        snippet,
+        publishedAt,
+        saved: true
+      });
+      bookmarkButton.classList.add('active');
+      bookmarkButton.querySelector('i').classList.add('active');
+      
+      // Also update save button
+      const saveButton = card.querySelector('.save-article-button');
+      if (saveButton) {
+        saveButton.textContent = 'Saved';
+        saveButton.disabled = true;
+        saveButton.style.opacity = '0.5';
+      }
+      
       card.classList.add('saved');
     }
+    
+    // Save updated bookmarks to localStorage
+    localStorage.setItem('bookmarkedNews', JSON.stringify(bookmarkedNews));
   }
 };
