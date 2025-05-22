@@ -1,3 +1,4 @@
+
 import { newsAPI } from '../api/newsAPI.js';
 import { getTemplate } from '../utils/templatesUtil.js';
 
@@ -72,7 +73,10 @@ export const newsModule = {
       .then(news => {
         // Display the first 3 news articles
         news.slice(0, 3).forEach(article => {
-          this.addNewsCard(article);
+          // Remove the 'saved' property to prevent auto-bookmarking
+          const newsArticle = {...article};
+          delete newsArticle.saved;
+          this.addNewsCard(newsArticle);
         });
       })
       .catch(error => {
