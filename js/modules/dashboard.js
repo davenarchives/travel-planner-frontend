@@ -58,12 +58,26 @@ export const dashboardModule = {
         description: 'Find and save flight options for your upcoming trips.',
         icon: 'fa-plane',
         count: 3
+      },
+      {
+        id: 'bookmark',
+        title: 'Bookmarked Flights',
+        type: 'bookmark',
+        description: 'View and manage your saved flights.',
+        icon: 'fa-bookmark',
+        count: this.getBookmarkCount()
       }
     ];
     
     modules.forEach(module => {
       this.createModuleCard(moduleGrid, module);
     });
+  },
+  
+  // Get bookmark count from localStorage
+  getBookmarkCount() {
+    const bookmarkedFlights = JSON.parse(localStorage.getItem('bookmarkedFlights') || '[]');
+    return bookmarkedFlights.length;
   },
   
   // Create a module card

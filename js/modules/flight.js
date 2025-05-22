@@ -126,6 +126,29 @@ export const flightModule = {
     card.querySelector('.price').textContent = flight.price;
     card.querySelector('.airline-name').textContent = flight.airline;
     
+    // Check if flight is bookmarked
+    const bookmarkButton = card.querySelector('.bookmark-button');
+    const flightId = `${flight.origin}-${flight.destination}-${flight.departureDate}`;
+    
+    // Set data attributes for bookmark functionality
+    const flightCard = card.querySelector('.card');
+    flightCard.dataset.flightId = flightId;
+    flightCard.dataset.origin = flight.origin;
+    flightCard.dataset.destination = flight.destination;
+    flightCard.dataset.departureDate = flight.departureDate;
+    flightCard.dataset.returnDate = flight.returnDate || '';
+    flightCard.dataset.price = flight.price;
+    flightCard.dataset.airline = flight.airline;
+    
+    // Check if flight is already bookmarked
+    const bookmarkedFlights = JSON.parse(localStorage.getItem('bookmarkedFlights') || '[]');
+    const isBookmarked = bookmarkedFlights.some(f => f.flightId === flightId);
+    
+    if (isBookmarked) {
+      bookmarkButton.classList.add('active');
+      bookmarkButton.querySelector('i').classList.add('active');
+    }
+    
     // Add to top of list for search results, otherwise add to end
     if (prepend) {
       flightCards.insertBefore(card, flightCards.firstChild.nextSibling); // After the heading
@@ -145,17 +168,55 @@ export const flightModule = {
     if (searchResultsHeading && !searchResultsHeading.nextElementSibling) {
       searchResultsHeading.remove();
     }
+    
+    // Remove from bookmarks if it's bookmarked
+    const flightId = card.dataset.flightId;
+    if (flightId) {
+      const bookmarkedFlights = JSON.parse(localStorage.getItem('bookmarkedFlights') || '[]');
+      const updatedBookmarks = bookmarkedFlights.filter(f => f.flightId !== flightId);
+      localStorage.setItem('bookmarkedFlights', JSON.stringify(updatedBookmarks));
+    }
   },
   
-  // Handle edit button click
-  handleEdit(card) {
-    // Toggle "Saved" label
-    const title = card.querySelector('.card-title');
+  // Handle bookmark button click
+  handleBookmark(card) {
+    const flightId = card.dataset.flightId;
+    const origin = card.dataset.origin;
+    const destination = card.dataset.destination;
+    const departureDate = card.dataset.departureDate;
+    const returnDate = card.dataset.returnDate;
+    const price = card.dataset.price;
+    const airline = card.dataset.airline;
     
-    if (title.textContent.includes('[Saved]')) {
-      title.textContent = title.textContent.replace(' [Saved]', '');
+    if (!flightId) return;
+    
+    const bookmarkedFlights = JSON.parse(localStorage.getItem('bookmarkedFlights') || '[]');
+    const bookmarkButton = card.querySelector('.bookmark-button');
+    
+    // Check if already bookmarked
+    const bookmarkIndex = bookmarkedFlights.findIndex(f => f.flightId === flightId);
+    
+    if (bookmarkIndex >= 0) {
+      // Remove from bookmarks
+      bookmarkedFlights.splice(bookmarkIndex, 1);
+      bookmarkButton.classList.remove('active');
+      bookmarkButton.querySelector('i').classList.remove('active');
     } else {
-      title.textContent = `${title.textContent} [Saved]`;
+      // Add to bookmarks
+      bookmarkedFlights.push({
+        flightId,
+        origin,
+        destination,
+        departureDate,
+        returnDate,
+        price,
+        airline
+      });
+      bookmarkButton.classList.add('active');
+      bookmarkButton.querySelector('i').classList.add('active');
     }
+    
+    // Save updated bookmarks to localStorage
+    localStorage.setItem('bookmarkedFlights', JSON.stringify(bookmarkedFlights));
   }
 };

@@ -13,6 +13,7 @@ import { countryModule } from './modules/country.js';
 import { currencyModule } from './modules/currency.js';
 import { newsModule } from './modules/news.js';
 import { flightModule } from './modules/flight.js';
+import { bookmarkModule } from './modules/bookmark.js';
 
 // Import utility functions
 import { loadTemplates, getTemplate } from './utils/templatesUtil.js';
@@ -42,7 +43,8 @@ const modules = {
   'country': countryModule,
   'currency': currencyModule,
   'news': newsModule,
-  'flight': flightModule
+  'flight': flightModule,
+  'bookmark': bookmarkModule
 };
 
 // Load a specific module
@@ -67,7 +69,8 @@ function loadModule(moduleId) {
     'country': 'Country Explorer',
     'currency': 'Currency Conversion',
     'news': 'Travel News',
-    'flight': 'Flight Search'
+    'flight': 'Flight Search',
+    'bookmark': 'Bookmarked Flights'
   };
   
   const moduleDescriptions = {
@@ -76,7 +79,8 @@ function loadModule(moduleId) {
     'country': 'Explore information about countries',
     'currency': 'Convert between different currencies',
     'news': 'Stay updated with travel news',
-    'flight': 'Find and save flight options'
+    'flight': 'Find and save flight options',
+    'bookmark': 'View and manage your saved flights'
   };
   
   moduleTitle.textContent = moduleTitles[moduleId];
@@ -127,13 +131,13 @@ function setupEventDelegation() {
       }
     }
     
-    // Handle edit button clicks
-    if (target.closest('.edit-button')) {
+    // Handle bookmark button clicks (replacing edit functionality)
+    if (target.closest('.bookmark-button')) {
       const card = target.closest('.card');
       const moduleId = getCurrentModule();
       
-      if (modules[moduleId] && modules[moduleId].handleEdit) {
-        modules[moduleId].handleEdit(card);
+      if (modules[moduleId] && modules[moduleId].handleBookmark) {
+        modules[moduleId].handleBookmark(card);
       }
     }
     
@@ -450,6 +454,19 @@ function createFlightCard(flight) {
   card.querySelector('.date-info').textContent = dateText;
   card.querySelector('.price').textContent = flight.price;
   card.querySelector('.airline-name').textContent = flight.airline;
+  
+  // Set data attributes for bookmark functionality
+  const flightId = `${flight.origin}-${flight.destination}-${flight.departureDate}`;
+  card.dataset.flightId = flightId;
+  
+  // Check if flight is already bookmarked
+  const bookmarkedFlights = JSON.parse(localStorage.getItem('bookmarkedFlights') || '[]');
+  const isBookmarked = bookmarkedFlights.some(f => f.flightId === flightId);
+  
+  if (isBookmarked) {
+    card.querySelector('.bookmark-button').classList.add('active');
+    card.querySelector('.bookmark-button i').classList.add('active');
+  }
   
   return card;
 }

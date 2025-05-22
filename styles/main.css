@@ -10,6 +10,7 @@
   --currency-color: #ffbe0b;
   --news-color: #f15bb5;
   --flight-color: #06d6a0;
+  --bookmark-color: #ff9e00;
   
   --bg-color: #f8f9fa;
   --card-bg: #ffffff;
@@ -289,6 +290,23 @@ input, select, button {
   transform: rotate(5deg) scale(1.1);
 }
 
+.bookmark-button {
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+}
+
+.bookmark-button.active i {
+  color: var(--bookmark-color);
+}
+
+.delete-button {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.delete-button:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
 .card-content {
   padding: 1.25rem;
 }
@@ -375,6 +393,10 @@ input, select, button {
   color: var(--flight-color);
 }
 
+.bookmark-icon i {
+  color: var(--bookmark-color);
+}
+
 /* Weather Card color scheme */
 .weather-header {
   background: linear-gradient(45deg, var(--weather-color), #90e0ef);
@@ -405,6 +427,21 @@ input, select, button {
   color: #fff;
 }
 
+/* Bookmark Card color scheme */
+.bookmark-header {
+  margin-bottom: 1.5rem;
+}
+
+.bookmark-header h2 {
+  font-size: 1.75rem;
+  color: var(--bookmark-color);
+  margin-bottom: 0.5rem;
+}
+
+.bookmark-header p {
+  color: var(--text-muted);
+}
+
 /* Grid and Layouts */
 .card-grid {
   display: grid;
@@ -414,6 +451,15 @@ input, select, button {
 
 .news-grid {
   grid-template-columns: 1fr;
+}
+
+/* No Data Messages */
+.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: var(--border-radius);
 }
 
 /* Forms with enhanced styling */
@@ -700,6 +746,24 @@ input, select, button {
   font-weight: 500;
 }
 
+/* Search Results Header */
+.search-results-heading {
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-results-heading h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.search-results-heading p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
 /* Tabs with enhanced styling */
 .tabs {
   margin-top: 1.5rem;
@@ -766,33 +830,7 @@ input, select, button {
   color: var(--text-muted);
 }
 
-/* Search Results Header */
-.search-results-heading {
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.search-results-heading h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--primary-color);
-}
-
-.search-results-heading p {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-/* No Data Messages */
-.no-data {
-  text-align: center;
-  padding: 3rem;
-  color: var(--text-muted);
-  background-color: rgba(0, 0, 0, 0.02);
-  border-radius: var(--border-radius);
-}
-
+/* Error message */
 .error-message {
   text-align: center;
   padding: 2rem;
