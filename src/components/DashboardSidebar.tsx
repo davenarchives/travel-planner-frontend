@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { 
   Sidebar, 
   SidebarHeader, 
@@ -15,27 +14,31 @@ import {
 import { 
   Cloud, 
   Flag, 
-  Currency, 
+  Banknote, 
   Newspaper, 
   Plane,
-  Sun
+  LayoutDashboard,
+  BookMarked,
+  LogOut
 } from 'lucide-react';
 
-type Module = 'dashboard' | 'weather' | 'country' | 'currency' | 'news' | 'flight';
+type Module = 'dashboard' | 'weather' | 'country' | 'currency' | 'news' | 'flight' | 'bookmarks';
 
 interface DashboardSidebarProps {
   activeModule: Module;
   onModuleChange: (module: Module) => void;
+  onLogout: () => void;
 }
 
-const DashboardSidebar = ({ activeModule, onModuleChange }: DashboardSidebarProps) => {
+const DashboardSidebar = ({ activeModule, onModuleChange, onLogout }: DashboardSidebarProps) => {
   const modules = [
-    { id: 'dashboard', name: 'Dashboard', icon: Sun },
+    { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
     { id: 'weather', name: 'Weather', icon: Cloud },
     { id: 'country', name: 'Countries', icon: Flag },
-    { id: 'currency', name: 'Currency', icon: Currency },
+    { id: 'currency', name: 'Currency', icon: Banknote },
     { id: 'news', name: 'News', icon: Newspaper },
     { id: 'flight', name: 'Flights', icon: Plane },
+    { id: 'bookmarks', name: 'Bookmarks', icon: BookMarked },
   ];
 
   return (
@@ -68,7 +71,11 @@ const DashboardSidebar = ({ activeModule, onModuleChange }: DashboardSidebarProp
       </SidebarContent>
       
       <SidebarFooter className="p-4">
-        <div className="text-sm text-sidebar-foreground/70">
+        <SidebarMenuButton onClick={onLogout}>
+          <LogOut className="h-5 w-5" />
+          <span>Logout</span>
+        </SidebarMenuButton>
+        <div className="text-sm text-sidebar-foreground/70 mt-4">
           Travel Planner v1.0
         </div>
       </SidebarFooter>
