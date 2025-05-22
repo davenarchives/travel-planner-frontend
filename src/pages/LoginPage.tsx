@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Cloud, Flag, Banknote, Newspaper, Plane } from "lucide-react";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -82,42 +83,61 @@ const LoginPage = () => {
           </div>
         </div>
 
-        {/* Feature overview section */}
+        {/* Feature overview section - Enhanced with more visual elements */}
         <div className="hidden md:block md:w-3/5 bg-gradient-to-br from-primary to-purple-700 p-12 text-white">
           <h2 className="text-3xl font-bold mb-6">Your Ultimate Travel Companion</h2>
           <p className="text-lg mb-8 opacity-90">Plan your journey with our comprehensive set of tools designed for modern travelers.</p>
           
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="flex items-start">
-              <Cloud className="h-6 w-6 mr-4 mt-1" />
+              <Cloud className="h-8 w-8 mr-4 mt-1" />
               <div>
                 <h3 className="text-xl font-semibold mb-2">Weather Tracking</h3>
-                <p className="opacity-80">Stay updated with accurate weather forecasts for all your destinations.</p>
+                <p className="opacity-80">Stay updated with accurate weather forecasts for all your destinations. Plan your activities based on real-time weather conditions.</p>
               </div>
             </div>
             
             <div className="flex items-start">
-              <Flag className="h-6 w-6 mr-4 mt-1" />
+              <Flag className="h-8 w-8 mr-4 mt-1" />
               <div>
                 <h3 className="text-xl font-semibold mb-2">Country Information</h3>
-                <p className="opacity-80">Access detailed information about countries including culture, visas, and travel advisories.</p>
+                <p className="opacity-80">Access detailed information about countries including culture, visa requirements, languages, currency, and travel advisories.</p>
               </div>
             </div>
             
             <div className="flex items-start">
-              <Banknote className="h-6 w-6 mr-4 mt-1" />
+              <Banknote className="h-8 w-8 mr-4 mt-1" />
               <div>
                 <h3 className="text-xl font-semibold mb-2">Currency Conversion</h3>
-                <p className="opacity-80">Convert between currencies with real-time exchange rates.</p>
+                <p className="opacity-80">Convert between currencies with real-time exchange rates. Plan your budget with accurate financial information.</p>
               </div>
             </div>
             
             <div className="flex items-start">
-              <Newspaper className="h-6 w-6 mr-4 mt-1" />
+              <Newspaper className="h-8 w-8 mr-4 mt-1" />
               <div>
                 <h3 className="text-xl font-semibold mb-2">Travel News</h3>
-                <p className="opacity-80">Read the latest travel news and updates from around the world.</p>
+                <p className="opacity-80">Read the latest travel news and updates from around the world. Stay informed about travel restrictions and opportunities.</p>
               </div>
+            </div>
+            
+            <div className="flex items-start">
+              <Plane className="h-8 w-8 mr-4 mt-1" />
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Flight Search</h3>
+                <p className="opacity-80">Find and compare flights to your dream destinations. Save your favorites and track price changes.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-10 text-center">
+            <p className="text-lg font-semibold">Join thousands of satisfied travelers</p>
+            <div className="flex justify-center mt-4 space-x-2">
+              <div className="w-2 h-2 bg-white rounded-full opacity-60"></div>
+              <div className="w-3 h-2 bg-white rounded-full opacity-80"></div>
+              <div className="w-4 h-2 bg-white rounded-full"></div>
+              <div className="w-3 h-2 bg-white rounded-full opacity-80"></div>
+              <div className="w-2 h-2 bg-white rounded-full opacity-60"></div>
             </div>
           </div>
         </div>

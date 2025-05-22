@@ -21,6 +21,15 @@ const DashboardLayout = () => {
         onLogout={logout}
       />
       <main className="flex-1 overflow-auto p-6 ml-[240px]">
+        {/* Apply a global style to make text in section headers white */}
+        <style jsx global>{`
+          .module-content > div:first-child p {
+            color: white !important;
+          }
+          .module-header p, .dashboard-hero p {
+            color: white !important;
+          }
+        `}</style>
         <Outlet />
       </main>
     </div>
