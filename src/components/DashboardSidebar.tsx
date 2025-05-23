@@ -32,14 +32,14 @@ const DashboardSidebar = ({ activeModule, onModuleChange }: DashboardSidebarProp
   const modules = [
     { id: 'dashboard', name: 'Dashboard', icon: Sun },
     { id: 'weather', name: 'Weather', icon: Cloud },
-    { id: 'country', name: 'Countries', icon: Flag },
+    { id: 'country', name: 'Countries', icon: Flag, color: 'text-emerald-500' },
     { id: 'currency', name: 'Currency', icon: Currency },
     { id: 'news', name: 'News', icon: Newspaper },
     { id: 'flight', name: 'Flights', icon: Plane },
   ];
 
   return (
-    <Sidebar className="border-r">
+    <Sidebar className="border-r overflow-hidden">
       <SidebarHeader className="p-4">
         <h2 className="text-xl font-bold flex items-center gap-2">
           <span className="text-[hsl(var(--sidebar-primary))]">
@@ -55,7 +55,7 @@ const DashboardSidebar = ({ activeModule, onModuleChange }: DashboardSidebarProp
             {modules.map((module) => (
               <SidebarMenuItem key={module.id}>
                 <SidebarMenuButton 
-                  className={activeModule === module.id ? 'bg-sidebar-accent text-sidebar-accent-foreground' : ''}
+                  className={`${activeModule === module.id ? 'bg-sidebar-accent text-sidebar-accent-foreground' : ''} ${module.color || ''}`}
                   onClick={() => onModuleChange(module.id as Module)}
                 >
                   <module.icon className="h-5 w-5" />

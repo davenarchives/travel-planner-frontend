@@ -1,3 +1,4 @@
+
 import { countryAPI } from '../api/countryAPI.js';
 import { getTemplate } from '../utils/templatesUtil.js';
 
@@ -33,10 +34,27 @@ export const countryModule = {
   },
 
   loadCountryData() {
-    const countries = ['Japan', 'Italy', 'New Zealand'];
-    countries.forEach(country => {
-      this.addCountry(country);
-    });
+    // Load initial country data from the API
+    countryAPI.getAllCountries()
+      .then(countries => {
+        if (countries && countries.length > 0) {
+          // We'll just load the first three countries or as many as available
+          const initialCountries = countries.slice(0, 3);
+          initialCountries.forEach(countryData => {
+            this.addCountryFromData(countryData);
+          });
+        } else {
+          console.warn('No countries returned from API');
+        }
+      })
+      .catch(error => {
+        console.error('Error loading initial country data:', error);
+        // Fallback to default countries if API fails
+        const countries = ['Japan', 'Italy', 'New Zealand'];
+        countries.forEach(country => {
+          this.addCountry(country);
+        });
+      });
   },
 
   addCountry(countryName) {
@@ -45,40 +63,54 @@ export const countryModule = {
 
     countryAPI.getCountryInfo(countryName)
       .then(country => {
-        const card = document.importNode(document.getElementById('country-card-template').content, true);
-
-        card.querySelector('.card-title').textContent = `${country.flag || ''} ${country.name}`;
-        card.querySelector('.capital').textContent = country.capital;
-        card.querySelector('.population').textContent = country.population;
-        card.querySelector('.region').textContent = country.region;
-
-        const tagsContainer = card.querySelector('.tags-container');
-        tagsContainer.innerHTML = '';
-        country.tags.forEach(tag => {
-          const tagElement = document.createElement('span');
-          tagElement.className = 'tag';
-          tagElement.textContent = tag;
-          tagsContainer.appendChild(tagElement);
-        });
-
-        const countryId = `country-${country.name.toLowerCase().replace(/\s/g, '-')}-${Date.now()}`;
-        const countryCard = card.querySelector('.card');
-        countryCard.dataset.countryId = countryId;
-
-        const bookmarkedCountries = JSON.parse(localStorage.getItem('bookmarkedCountries') || '[]');
-        const isBookmarked = bookmarkedCountries.some(c => c.name === country.name);
-
-        if (isBookmarked) {
-          const bookmarkButton = card.querySelector('.bookmark-button');
-          bookmarkButton.classList.add('active');
-          bookmarkButton.querySelector('i').classList.add('active');
+        if (country) {
+          this.addCountryFromData(country);
+        } else {
+          console.error(`Country ${countryName} not found`);
         }
-
-        countryCards.appendChild(card);
       })
       .catch(error => {
         console.error('Error loading country data:', error);
       });
+  },
+
+  addCountryFromData(country) {
+    const countryCards = document.getElementById('country-cards');
+    if (!countryCards) return;
+
+    const card = document.importNode(document.getElementById('country-card-template').content, true);
+
+    card.querySelector('.card-title').textContent = `${country.flag || ''} ${country.name}`;
+    card.querySelector('.capital').textContent = country.capital;
+    card.querySelector('.population').textContent = country.population;
+    card.querySelector('.region').textContent = country.region;
+
+    const tagsContainer = card.querySelector('.tags-container');
+    tagsContainer.innerHTML = '';
+    
+    // Check if tags exist, if not use an empty array
+    const tags = country.tags || [];
+    tags.forEach(tag => {
+      const tagElement = document.createElement('span');
+      tagElement.className = 'tag';
+      tagElement.textContent = tag;
+      tagsContainer.appendChild(tagElement);
+    });
+
+    const countryId = `country-${country.name.toLowerCase().replace(/\s/g, '-')}-${Date.now()}`;
+    const countryCard = card.querySelector('.card');
+    countryCard.dataset.countryId = countryId;
+
+    const bookmarkedCountries = JSON.parse(localStorage.getItem('bookmarkedCountries') || '[]');
+    const isBookmarked = bookmarkedCountries.some(c => c.name === country.name);
+
+    if (isBookmarked) {
+      const bookmarkButton = card.querySelector('.bookmark-button');
+      bookmarkButton.classList.add('active');
+      bookmarkButton.querySelector('i').classList.add('active');
+    }
+
+    countryCards.appendChild(card);
   },
 
   handleDelete(card) {
