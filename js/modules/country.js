@@ -5,8 +5,8 @@ export const countryModule = {
   init(container) {
     const template = getTemplate("country-template")
     container.appendChild(template)
-    this.loadCountryData()
     this.setupEventListeners()
+    this.loadSavedCountries()
   },
 
   setupEventListeners() {
@@ -30,59 +30,49 @@ export const countryModule = {
         }
       })
     }
-
-    // Event delegation for bookmark and delete buttons
-    document.addEventListener("click", (event) => {
-      const card = event.target.closest(".card")
-      if (!card) return
-
-      if (event.target.closest(".bookmark-button")) {
-        this.handleBookmark(card)
-      } else if (event.target.closest(".delete-button")) {
-        this.handleDelete(card)
-      }
-    })
   },
 
-  loadCountryData() {
-    // Load initial country data from the API
-    countryAPI
-      .getAllCountries()
-      .then((countries) => {
-        if (countries && countries.length > 0) {
-          // We'll just load the first three countries or as many as available
-          const initialCountries = countries.slice(0, 3)
-          initialCountries.forEach((countryData) => {
-            this.addCountryFromData(countryData)
-          })
-        } else {
-          console.warn("No countries returned from API")
-          // Show a message to the user
-          const countryCards = document.getElementById("country-cards")
-          if (countryCards) {
-            countryCards.innerHTML = `
-              <div class="no-data">
-                <i class="fas fa-globe fa-3x mb-3"></i>
-                <h3>No Countries Found</h3>
-                <p>Try adding a country using the search bar above.</p>
-              </div>
-            `
-          }
-        }
+  loadSavedCountries() {
+    const savedCountries = JSON.parse(localStorage.getItem('savedCountries') || '[]')
+    const countryCards = document.getElementById("country-cards")
+    
+    if (savedCountries.length === 0) {
+      this.showInitialMessage()
+    } else {
+      // Clear the initial message
+      const noDataElement = countryCards?.querySelector(".no-data")
+      if (noDataElement) {
+        noDataElement.remove()
+      }
+      
+      savedCountries.forEach(country => {
+        this.addCountryFromData(country, false) // false = don't save again
       })
-      .catch((error) => {
-        console.error("Error loading initial country data:", error)
-        // Fallback to default countries if API fails
-        const countries = ["Japan", "Italy", "New Zealand"]
-        countries.forEach((country) => {
-          this.addCountry(country)
-        })
-      })
+    }
+  },
+
+  showInitialMessage() {
+    const countryCards = document.getElementById("country-cards")
+    if (countryCards) {
+      countryCards.innerHTML = `
+        <div class="no-data">
+          <i class="fas fa-globe fa-3x mb-3"></i>
+          <h3>Search for Countries</h3>
+          <p>Use the search bar above to explore country information.</p>
+        </div>
+      `
+    }
   },
 
   addCountry(countryName) {
     const countryCards = document.getElementById("country-cards")
     if (!countryCards) return
+
+    // Clear the initial message if it exists
+    const noDataElement = countryCards.querySelector(".no-data")
+    if (noDataElement) {
+      noDataElement.remove()
+    }
 
     // Show loading state
     const loadingCard = document.createElement("div")
@@ -102,7 +92,7 @@ export const countryModule = {
         loadingCard.remove()
 
         if (country) {
-          this.addCountryFromData(country)
+          this.addCountryFromData(country, true) // true = save to localStorage
         } else {
           console.error(`Country ${countryName} not found`)
           // Show error message
@@ -145,9 +135,14 @@ export const countryModule = {
       })
   },
 
-  addCountryFromData(country) {
+  addCountryFromData(country, shouldSave = true) {
     const countryCards = document.getElementById("country-cards")
     if (!countryCards) return
+
+    // Save to localStorage if requested
+    if (shouldSave) {
+      this.saveCountryToStorage(country)
+    }
 
     const card = document.importNode(document.getElementById("country-card-template").content, true)
 
@@ -161,7 +156,6 @@ export const countryModule = {
     const tagsContainer = card.querySelector(".tags-container")
     tagsContainer.innerHTML = ""
 
-    // Check if tags exist, if not use an empty array
     const tags = country.tags || []
     tags.forEach((tag) => {
       const tagElement = document.createElement("span")
@@ -187,21 +181,57 @@ export const countryModule = {
     countryCards.appendChild(card)
   },
 
+  saveCountryToStorage(country) {
+    const savedCountries = JSON.parse(localStorage.getItem('savedCountries') || '[]')
+    
+    // Check if country already exists
+    const existingIndex = savedCountries.findIndex(c => c.name === country.name)
+    if (existingIndex === -1) {
+      savedCountries.push(country)
+      localStorage.setItem('savedCountries', JSON.stringify(savedCountries))
+    }
+  },
+
   formatPopulation(population) {
-    if (typeof population !== "number") {
+    // Handle both string and number formats
+    if (typeof population === "string") {
+      // If it's already formatted (like "125,836,021"), return as is
+      if (population.includes(",")) {
+        const num = parseInt(population.replace(/,/g, ""))
+        if (num >= 1000000) {
+          return `${(num / 1000000).toFixed(1)} million`
+        } else if (num >= 1000) {
+          return `${(num / 1000).toFixed(1)}k`
+        }
+        return population
+      }
       return population
     }
 
-    if (population >= 1000000) {
-      return `${(population / 1000000).toFixed(1)} million`
-    } else if (population >= 1000) {
-      return `${(population / 1000).toFixed(1)}k`
+    if (typeof population === "number") {
+      if (population >= 1000000) {
+        return `${(population / 1000000).toFixed(1)} million`
+      } else if (population >= 1000) {
+        return `${(population / 1000).toFixed(1)}k`
+      }
+      return population.toString()
     }
-    return population.toString()
+
+    return population
   },
 
   handleDelete(card) {
+    const countryName = card.dataset.countryName
+    
+    // Remove from DOM
     card.remove()
+    
+    // Remove from saved countries
+    const savedCountries = JSON.parse(localStorage.getItem('savedCountries') || '[]')
+    const updatedCountries = savedCountries.filter(c => c.name !== countryName)
+    localStorage.setItem('savedCountries', JSON.stringify(updatedCountries))
+    
+    // Remove from bookmarks if bookmarked
     const countryId = card.dataset.countryId
     if (countryId) {
       const bookmarkedCountries = JSON.parse(localStorage.getItem("bookmarkedCountries") || "[]")
@@ -229,10 +259,12 @@ export const countryModule = {
     const bookmarkIndex = bookmarkedCountries.findIndex((c) => c.countryId === countryId)
 
     if (bookmarkIndex >= 0) {
+      // Remove from bookmarks
       bookmarkedCountries.splice(bookmarkIndex, 1)
       bookmarkButton.classList.remove("active")
       bookmarkButton.querySelector("i").classList.remove("active")
     } else {
+      // Add to bookmarks
       bookmarkedCountries.push({
         countryId,
         name,

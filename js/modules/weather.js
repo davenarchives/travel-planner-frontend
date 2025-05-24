@@ -1,4 +1,3 @@
-
 import { weatherAPI } from '../api/weatherAPI.js';
 import { getTemplate } from '../utils/templatesUtil.js';
 
@@ -9,8 +8,8 @@ export const weatherModule = {
     const template = getTemplate('weather-template');
     container.appendChild(template);
     
-    // Load initial data
-    this.loadWeatherData();
+    // Load saved data first
+    this.loadSavedWeather();
     
     // Set up event listeners
     this.setupEventListeners();
@@ -42,15 +41,22 @@ export const weatherModule = {
     }
   },
   
-  // Load initial weather data
-  loadWeatherData() {
-    // Initial cities to load
-    const cities = ['New York', 'London', 'Tokyo'];
+  // Load saved weather data from localStorage
+  loadSavedWeather() {
+    const savedWeather = JSON.parse(localStorage.getItem('savedWeather') || '[]');
     
-    // Get weather data for each city
-    cities.forEach(city => {
-      this.addCity(city);
-    });
+    if (savedWeather.length === 0) {
+      // Load initial cities if no saved data
+      const cities = ['New York', 'London', 'Tokyo'];
+      cities.forEach(city => {
+        this.addCity(city);
+      });
+    } else {
+      // Load saved weather data
+      savedWeather.forEach(weather => {
+        this.addWeatherFromData(weather);
+      });
+    }
   },
   
   // Add a city to the weather tracking
@@ -61,38 +67,67 @@ export const weatherModule = {
     // Get weather data from API
     weatherAPI.getWeather(city)
       .then(weather => {
-        const card = document.importNode(document.getElementById('weather-card-template').content, true);
-        
-        card.querySelector('.card-title').textContent = weather.city;
-        card.querySelector('.weather-icon').innerHTML = `<i class="fas ${weather.icon}"></i>`;
-        card.querySelector('.temperature').textContent = `${weather.temperature}°F`;
-        card.querySelector('.condition').textContent = weather.condition;
-        
-        // Generate a unique ID for the weather
-        const weatherId = `weather-${weather.city.toLowerCase().replace(/\s/g, '-')}-${Date.now()}`;
-        const weatherCard = card.querySelector('.card');
-        weatherCard.dataset.weatherId = weatherId;
-        
-        // Check if already bookmarked
-        const bookmarkedWeather = JSON.parse(localStorage.getItem('bookmarkedWeather') || '[]');
-        const isBookmarked = bookmarkedWeather.some(w => w.city === weather.city);
-        
-        if (isBookmarked) {
-          const bookmarkButton = card.querySelector('.bookmark-button');
-          bookmarkButton.classList.add('active');
-          bookmarkButton.querySelector('i').classList.add('active');
-        }
-        
-        weatherCards.appendChild(card);
+        this.addWeatherFromData(weather);
+        this.saveWeatherToStorage(weather);
       })
       .catch(error => {
         console.error('Error loading weather data:', error);
       });
   },
   
+  // Add weather card from data
+  addWeatherFromData(weather) {
+    const weatherCards = document.getElementById('weather-cards');
+    if (!weatherCards) return;
+    
+    const card = document.importNode(document.getElementById('weather-card-template').content, true);
+    
+    card.querySelector('.card-title').textContent = weather.city;
+    card.querySelector('.weather-icon').innerHTML = `<i class="fas ${weather.icon}"></i>`;
+    card.querySelector('.temperature').textContent = `${weather.temperature}°F`;
+    card.querySelector('.condition').textContent = weather.condition;
+    
+    // Generate a unique ID for the weather
+    const weatherId = `weather-${weather.city.toLowerCase().replace(/\s/g, '-')}-${Date.now()}`;
+    const weatherCard = card.querySelector('.card');
+    weatherCard.dataset.weatherId = weatherId;
+    
+    // Check if already bookmarked
+    const bookmarkedWeather = JSON.parse(localStorage.getItem('bookmarkedWeather') || '[]');
+    const isBookmarked = bookmarkedWeather.some(w => w.city === weather.city);
+    
+    if (isBookmarked) {
+      const bookmarkButton = card.querySelector('.bookmark-button');
+      bookmarkButton.classList.add('active');
+      bookmarkButton.querySelector('i').classList.add('active');
+    }
+    
+    weatherCards.appendChild(card);
+  },
+  
+  // Save weather to localStorage
+  saveWeatherToStorage(weather) {
+    const savedWeather = JSON.parse(localStorage.getItem('savedWeather') || '[]');
+    
+    // Check if weather already exists
+    const existingIndex = savedWeather.findIndex(w => w.city === weather.city);
+    if (existingIndex === -1) {
+      savedWeather.push(weather);
+      localStorage.setItem('savedWeather', JSON.stringify(savedWeather));
+    }
+  },
+  
   // Handle delete button click
   handleDelete(card) {
+    const city = card.querySelector('.card-title').textContent;
+    
+    // Remove from DOM
     card.remove();
+    
+    // Remove from saved weather
+    const savedWeather = JSON.parse(localStorage.getItem('savedWeather') || '[]');
+    const updatedWeather = savedWeather.filter(w => w.city !== city);
+    localStorage.setItem('savedWeather', JSON.stringify(updatedWeather));
     
     // Remove from bookmarks if bookmarked
     const weatherId = card.dataset.weatherId;

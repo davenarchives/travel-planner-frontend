@@ -1,133 +1,55 @@
 export const countryAPI = {
-  baseUrl: "http://localhost:8000",
+  laravelUrl: "http://localhost:8000",
+  restCountriesUrl: "https://restcountries.com/v3.1",
 
   // Get info about a single country
   async getCountryInfo(countryName) {
     try {
-      const response = await fetch(`${this.baseUrl}/countries/${encodeURIComponent(countryName)}`)
-      if (!response.ok) {
-        throw new Error(`Country ${countryName} not found`)
+      // First try Laravel backend
+      console.log(`Trying Laravel backend for ${countryName}...`);
+      const laravelResponse = await fetch(`${this.laravelUrl}/countries/${encodeURIComponent(countryName)}`);
+      
+      if (laravelResponse.ok) {
+        console.log(`✅ Laravel backend responded for ${countryName}`);
+        const data = await laravelResponse.json();
+        return data;
+      } else {
+        throw new Error(`Laravel backend returned ${laravelResponse.status}`);
       }
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error("Error fetching country info:", error)
-      return null
+    } catch (laravelError) {
+      console.warn(`⚠️ Laravel backend failed for ${countryName}:`, laravelError.message);
+      console.log(`🔄 Falling back to REST Countries API...`);
+      
+      try {
+        // Fallback to REST Countries API
+        const restResponse = await fetch(`${this.restCountriesUrl}/name/${encodeURIComponent(countryName)}`);
+        
+        if (!restResponse.ok) {
+          throw new Error(`Country ${countryName} not found in REST Countries API`);
+        }
+        
+        const restData = await restResponse.json();
+        const country = restData[0]; // REST Countries returns an array
+        
+        console.log(`✅ REST Countries API responded for ${countryName}`);
+        
+        // Transform REST Countries data to match your Laravel format
+        return {
+          name: country.name.common,
+          capital: country.capital ? country.capital[0] : "Unknown",
+          population: country.population.toLocaleString(),
+          region: country.region,
+          flag: country.flag,
+          tags: [
+            country.subregion?.toLowerCase() || "country",
+            country.continents?.[0]?.toLowerCase() || "continent",
+            country.landlocked ? "landlocked" : "coastal"
+          ].filter(Boolean)
+        };
+      } catch (restError) {
+        console.error(`❌ Both Laravel and REST Countries failed for ${countryName}:`, restError);
+        return null;
+      }
     }
-  },
-
-  // Get all countries (requires you to implement GET /countries in Laravel)
-  async getAllCountries() {
-    try {
-      const response = await fetch(`${this.baseUrl}/countries`)
-      if (!response.ok) {
-        throw new Error("Failed to fetch all countries")
-      }
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error("Error fetching all countries:", error)
-      return []
-    }
-  },
-
-  // Search for countries (requires GET /countries?search=term OR falls back to client-side filtering)
-  async searchCountries(searchTerm) {
-    if (!searchTerm) return []
-
-    try {
-      // If your Laravel API supports search query
-      const response = await fetch(`${this.baseUrl}/countries?search=${encodeURIComponent(searchTerm)}`)
-      if (!response.ok) {
-        throw new Error("Search failed")
-      }
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.warn("Fallback to client-side search due to error:", error)
-
-      // Fallback: get all and filter client-side
-      const allCountries = await this.getAllCountries()
-      const filtered = allCountries.filter(
-        (c) =>
-          c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (c.capital && c.capital.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (c.region && c.region.toLowerCase().includes(searchTerm.toLowerCase())),
-      )
-      return filtered
-    }
-  },
-
-  // Add a city to a country
-  async addCityToCountry(countryName, cityName) {
-    try {
-      // First get the current country data
-      const country = await this.getCountryInfo(countryName)
-      if (!country) {
-        throw new Error(`Country ${countryName} not found`)
-      }
-
-      // Add the city to the country's cities array
-      const cities = country.cities || []
-      if (!cities.includes(cityName)) {
-        cities.push(cityName)
-      }
-
-      // Update the country with the new cities array
-      const response = await fetch(`${this.baseUrl}/countries/${encodeURIComponent(countryName)}/cities`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ cities }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to add city to ${countryName}`)
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error("Error adding city to country:", error)
-      return null
-    }
-  },
-
-  // Get a specific country by name
-  async getCountry(name) {
-    try {
-      const response = await fetch(`${this.baseUrl}/countries/${name}`)
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch country: ${response.statusText}`)
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error("Error fetching country:", error)
-      throw error
-    }
-  },
-
-  // Add or update cities for a country
-  async updateCities(countryName, cities) {
-    try {
-      const response = await fetch(`${this.baseUrl}/countries/${countryName}/cities`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ cities }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to update cities: ${response.statusText}`)
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error("Error updating cities:", error)
-      throw error
-    }
-  },
+  }
 }

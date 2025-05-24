@@ -1,3 +1,4 @@
+// js/modules/dashboard.js
 
 import { loadModule } from '../app.js';
 import { getTemplate } from '../utils/templatesUtil.js';
@@ -25,7 +26,7 @@ export const dashboardModule = {
         type: 'weather',
         description: 'Monitor weather conditions for your favorite destinations.',
         icon: 'fa-cloud',
-        count: 3
+        count: this.getSavedItemsCount('weather')
       },
       {
         id: 'country',
@@ -33,7 +34,7 @@ export const dashboardModule = {
         type: 'country',
         description: 'Save and compare details about countries you plan to visit.',
         icon: 'fa-flag',
-        count: 3
+        count: this.getSavedItemsCount('country')
       },
       {
         id: 'currency',
@@ -41,7 +42,7 @@ export const dashboardModule = {
         type: 'currency',
         description: 'Track exchange rates for your travel destinations.',
         icon: 'fa-money-bill',
-        count: 3
+        count: this.getSavedItemsCount('currency')
       },
       {
         id: 'news',
@@ -49,7 +50,7 @@ export const dashboardModule = {
         type: 'news',
         description: 'Stay updated with the latest travel news and alerts.',
         icon: 'fa-newspaper',
-        count: 3
+        count: this.getSavedItemsCount('news')
       },
       {
         id: 'flight',
@@ -57,13 +58,13 @@ export const dashboardModule = {
         type: 'flight',
         description: 'Find and save flight options for your upcoming trips.',
         icon: 'fa-plane',
-        count: 3
+        count: this.getSavedItemsCount('flight')
       },
       {
         id: 'bookmark',
-        title: 'Bookmarked Flights',
+        title: 'Bookmarked Items',
         type: 'bookmark',
-        description: 'View and manage your saved flights.',
+        description: 'View and manage your saved items.',
         icon: 'fa-bookmark',
         count: this.getBookmarkCount()
       }
@@ -74,10 +75,33 @@ export const dashboardModule = {
     });
   },
   
+  // Get saved items count for each module
+  getSavedItemsCount(moduleType) {
+    switch(moduleType) {
+      case 'weather':
+        return JSON.parse(localStorage.getItem('savedWeather') || '[]').length;
+      case 'country':
+        return JSON.parse(localStorage.getItem('savedCountries') || '[]').length;
+      case 'currency':
+        return JSON.parse(localStorage.getItem('savedCurrencies') || '[]').length;
+      case 'news':
+        return JSON.parse(localStorage.getItem('savedNews') || '[]').length;
+      case 'flight':
+        return JSON.parse(localStorage.getItem('savedFlights') || '[]').length;
+      default:
+        return 0;
+    }
+  },
+  
   // Get bookmark count from localStorage
   getBookmarkCount() {
     const bookmarkedFlights = JSON.parse(localStorage.getItem('bookmarkedFlights') || '[]');
-    return bookmarkedFlights.length;
+    const bookmarkedWeather = JSON.parse(localStorage.getItem('bookmarkedWeather') || '[]');
+    const bookmarkedCountries = JSON.parse(localStorage.getItem('bookmarkedCountries') || '[]');
+    const bookmarkedCurrencies = JSON.parse(localStorage.getItem('bookmarkedCurrencies') || '[]');
+    const bookmarkedNews = JSON.parse(localStorage.getItem('bookmarkedNews') || '[]');
+    
+    return bookmarkedFlights.length + bookmarkedWeather.length + bookmarkedCountries.length + bookmarkedCurrencies.length + bookmarkedNews.length;
   },
   
   // Create a module card
@@ -106,7 +130,7 @@ export const dashboardModule = {
         e.stopPropagation(); // Prevent card click event from triggering
         loadModule(module.id);
       });
-    }
+  }
     
     // Make the entire card clickable
     card.addEventListener('click', () => {

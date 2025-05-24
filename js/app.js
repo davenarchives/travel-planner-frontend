@@ -1,4 +1,3 @@
-
 // Import API modules
 import { weatherAPI } from './api/weatherAPI.js';
 import { countryAPI } from './api/countryAPI.js';
@@ -243,6 +242,31 @@ function updateBookmarkCount() {
   if (bookmarkCountElement) {
     bookmarkCountElement.textContent = totalCount;
     bookmarkCountElement.classList.toggle('hidden', totalCount === 0);
+  }
+}
+
+// Get saved items count for each module
+function getSavedItemsCount(moduleType) {
+  switch(moduleType) {
+    case 'weather':
+      return JSON.parse(localStorage.getItem('savedWeather') || '[]').length;
+    case 'country':
+      return JSON.parse(localStorage.getItem('savedCountries') || '[]').length;
+    case 'currency':
+      return JSON.parse(localStorage.getItem('savedCurrencies') || '[]').length;
+    case 'news':
+      return JSON.parse(localStorage.getItem('savedNews') || '[]').length;
+    case 'flight':
+      return JSON.parse(localStorage.getItem('savedFlights') || '[]').length;
+    case 'bookmark':
+      const bookmarkedFlights = JSON.parse(localStorage.getItem('bookmarkedFlights') || '[]');
+      const bookmarkedWeather = JSON.parse(localStorage.getItem('bookmarkedWeather') || '[]');
+      const bookmarkedCountries = JSON.parse(localStorage.getItem('bookmarkedCountries') || '[]');
+      const bookmarkedCurrencies = JSON.parse(localStorage.getItem('bookmarkedCurrencies') || '[]');
+      const bookmarkedNews = JSON.parse(localStorage.getItem('bookmarkedNews') || '[]');
+      return bookmarkedFlights.length + bookmarkedWeather.length + bookmarkedCountries.length + bookmarkedCurrencies.length + bookmarkedNews.length;
+    default:
+      return 0;
   }
 }
 
@@ -570,4 +594,4 @@ function getCurrentModule() {
 }
 
 // Export for other modules
-export { loadModule };
+export { loadModule, getSavedItemsCount, updateBookmarkCount };

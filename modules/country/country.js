@@ -2,47 +2,29 @@ import { getTemplate } from "../../js/templates.js"
 import { countryAPI } from "../../js/api/countryAPI.js"
 
 export const countryModule = {
-  // Mock data for countries (will be replaced with API data)
-  countryData: [
-    {
-      name: "Japan",
-      capital: "Tokyo",
-      population: "126.3 million",
-      region: "Asia",
-      flag: "🇯🇵",
-      tags: ["Bucket List", "Cherry Blossoms"],
-      cities: ["Tokyo", "Kyoto", "Osaka"],
-    },
-    {
-      name: "Italy",
-      capital: "Rome",
-      population: "60.4 million",
-      region: "Europe",
-      flag: "🇮🇹",
-      tags: ["Food", "History"],
-      cities: ["Rome", "Florence", "Venice"],
-    },
-    {
-      name: "New Zealand",
-      capital: "Wellington",
-      population: "4.9 million",
-      region: "Oceania",
-      flag: "🇳🇿",
-      tags: ["Nature", "Adventure"],
-      cities: ["Auckland", "Wellington", "Queenstown"],
-    },
-  ],
-
   init(container) {
     // Create the country module view
     const template = getTemplate("country-template")
     container.appendChild(template)
 
-    // Load initial data
-    this.loadCountryData()
+    // Show initial message
+    this.showInitialMessage()
 
     // Set up event listeners
     this.setupEventListeners()
+  },
+
+  showInitialMessage() {
+    const countryCards = document.getElementById("country-cards")
+    if (countryCards) {
+      countryCards.innerHTML = `
+      <div class="no-data">
+        <i class="fas fa-globe fa-3x mb-3"></i>
+        <h3>Search for Countries</h3>
+        <p>Use the search bar above to explore country information.</p>
+      </div>
+    `
+    }
   },
 
   setupEventListeners() {
@@ -70,40 +52,30 @@ export const countryModule = {
     }
   },
 
-  async loadCountryData() {
-    try {
-      // Try to fetch countries from API
-      const countries = await countryAPI.getAllCountries()
-      if (countries && countries.length > 0) {
-        // If API returns countries, use them
-        countries.forEach((country) => {
-          this.addCountryCard(country.name, country)
-        })
-      } else {
-        // Fallback to mock data if API fails or returns empty
-        this.countryData.forEach((country) => {
-          this.addCountryCard(country.name, country)
-        })
-      }
-    } catch (error) {
-      console.error("Error loading countries, using mock data:", error)
-      // Fallback to mock data
-      this.countryData.forEach((country) => {
-        this.addCountryCard(country.name, country)
-      })
-    }
-  },
-
   async fetchAndAddCountry(name) {
+    const countryCards = document.getElementById("country-cards")
+    if (!countryCards) return
+
+    // Clear the initial message if it exists
+    const noDataElement = countryCards.querySelector(".no-data")
+    if (noDataElement) {
+      noDataElement.remove()
+    }
+
     try {
       // Show loading state
       const loadingEl = document.createElement("div")
-      loadingEl.className = "loading-message"
-      loadingEl.textContent = `Loading ${name}...`
-      document.getElementById("country-cards")?.appendChild(loadingEl)
+      loadingEl.className = "loading-message card"
+      loadingEl.innerHTML = `
+      <div class="card-content text-center p-4">
+        <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+        <p>Loading ${name}...</p>
+      </div>
+    `
+      countryCards.appendChild(loadingEl)
 
       // Try to fetch from API
-      const country = await countryAPI.getCountry(name)
+      const country = await countryAPI.getCountryInfo(name)
 
       // Remove loading message
       loadingEl.remove()
@@ -119,19 +91,16 @@ export const countryModule = {
       // Remove loading message if it exists
       document.querySelector(".loading-message")?.remove()
 
-      // Add with placeholder data
-      this.addCountryCard(name)
-
       // Show error message
       const errorEl = document.createElement("div")
-      errorEl.className = "error-message"
-      errorEl.textContent = `Could not fetch data for ${name} from API. Using placeholder data.`
-      errorEl.style.cssText = "color: #ef4444; font-size: 0.8rem; margin-top: 0.5rem;"
-
-      // Find the card we just added and append error message
-      const cards = document.querySelectorAll(".card")
-      const lastCard = cards[cards.length - 1]
-      lastCard.querySelector(".card-content").appendChild(errorEl)
+      errorEl.className = "error-message card"
+      errorEl.innerHTML = `
+      <div class="card-content text-center p-4">
+        <i class="fas fa-exclamation-circle fa-2x mb-3" style="color: #ef4444;"></i>
+        <p>Could not fetch data for "${name}". Please check the country name and try again.</p>
+      </div>
+    `
+      countryCards.appendChild(errorEl)
 
       // Auto-remove error after 5 seconds
       setTimeout(() => {
@@ -144,102 +113,22 @@ export const countryModule = {
     const countryCards = document.getElementById("country-cards")
     if (!countryCards) return
 
-    // Use provided data or generate placeholder data
-    const country = data || {
-      capital: "Sample Capital",
-      population: "Unknown",
-      region: "Unknown",
-      flag: "🏳️",
-      tags: ["New"],
-      cities: [],
-    }
-
     const template = getTemplate("country-card-template")
 
-    template.querySelector(".card-title").textContent = `${country.flag || ""} ${name}`
-    template.querySelector(".capital").textContent = country.capital
-    template.querySelector(".population").textContent = country.population
-    template.querySelector(".region").textContent = country.region
+    template.querySelector(".card-title").textContent = `${data.flag || ""} ${name}`
+    template.querySelector(".capital").textContent = data.capital || "Unknown"
+    template.querySelector(".population").textContent = this.formatPopulation(data.population) || "Unknown"
+    template.querySelector(".region").textContent = data.region || "Unknown"
 
     const tagsContainer = template.querySelector(".tags-container")
     tagsContainer.innerHTML = "" // Clear any existing tags
 
-    country.tags.forEach((tag) => {
+    const tags = data.tags || []
+    tags.forEach((tag) => {
       const tagElement = document.createElement("span")
       tagElement.className = "tag"
       tagElement.textContent = tag
       tagsContainer.appendChild(tagElement)
-    })
-
-    // Add cities section
-    const cardContent = template.querySelector(".card-content")
-
-    // Create cities section
-    const citySection = document.createElement("div")
-    citySection.className = "city-section"
-
-    const cityHeading = document.createElement("h4")
-    cityHeading.className = "city-heading"
-    cityHeading.textContent = "Cities"
-    citySection.appendChild(cityHeading)
-
-    // Add city input
-    const cityInputContainer = document.createElement("div")
-    cityInputContainer.className = "city-input-container"
-
-    const cityInput = document.createElement("input")
-    cityInput.type = "text"
-    cityInput.className = "form-input city-input"
-    cityInput.placeholder = "Add a city..."
-
-    const addCityBtn = document.createElement("button")
-    addCityBtn.className = "primary-button add-city-btn"
-    addCityBtn.textContent = "Add"
-
-    cityInputContainer.appendChild(cityInput)
-    cityInputContainer.appendChild(addCityBtn)
-    citySection.appendChild(cityInputContainer)
-
-    // Create city list
-    const cityList = document.createElement("div")
-    cityList.className = "city-list"
-
-    // Add existing cities
-    if (country.cities && country.cities.length > 0) {
-      country.cities.forEach((city) => {
-        const cityItem = this.createCityItem(city, name)
-        cityList.appendChild(cityItem)
-      })
-    }
-
-    citySection.appendChild(cityList)
-    cardContent.appendChild(citySection)
-
-    // Add event listener for adding cities
-    addCityBtn.addEventListener("click", () => {
-      const cityName = cityInput.value.trim()
-      if (cityName) {
-        // Add to UI
-        const cityItem = this.createCityItem(cityName, name)
-        cityList.appendChild(cityItem)
-        cityInput.value = ""
-
-        // Update cities array
-        const cities = Array.from(cityList.querySelectorAll(".city-item")).map(
-          (item) => item.querySelector("span").textContent,
-        )
-
-        // Update via API
-        this.updateCities(name, cities)
-      }
-    })
-
-    // Enter key for city input
-    cityInput.addEventListener("keypress", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault()
-        addCityBtn.click()
-      }
     })
 
     // Add the card to the grid
@@ -251,52 +140,38 @@ export const countryModule = {
       deleteBtn.addEventListener("click", () => this.handleDelete(template))
     }
 
-    const editBtn = template.querySelector(".edit-button")
-    if (editBtn) {
-      editBtn.addEventListener("click", () => this.handleEdit(template))
+    const bookmarkBtn = template.querySelector(".bookmark-button")
+    if (bookmarkBtn) {
+      bookmarkBtn.addEventListener("click", () => this.handleBookmark(template))
     }
   },
 
-  createCityItem(cityName, countryName) {
-    const cityItem = document.createElement("div")
-    cityItem.className = "city-item"
-
-    const cityText = document.createElement("span")
-    cityText.textContent = cityName
-
-    const removeBtn = document.createElement("button")
-    removeBtn.className = "remove-city-btn"
-    removeBtn.innerHTML = "&times;"
-    removeBtn.title = "Remove city"
-
-    removeBtn.addEventListener("click", () => {
-      cityItem.remove()
-
-      // Get updated list of cities
-      const cityList = cityItem.parentElement
-      const cities = Array.from(cityList.querySelectorAll(".city-item")).map(
-        (item) => item.querySelector("span").textContent,
-      )
-
-      // Update via API
-      this.updateCities(countryName, cities)
-    })
-
-    cityItem.appendChild(cityText)
-    cityItem.appendChild(removeBtn)
-
-    return cityItem
-  },
-
-  async updateCities(countryName, cities) {
-    try {
-      await countryAPI.updateCities(countryName, cities)
-      console.log(`Cities updated for ${countryName}`)
-    } catch (error) {
-      console.error(`Error updating cities for ${countryName}:`, error)
-      // Show error message
-      alert(`Failed to update cities for ${countryName}. Please try again.`)
+  formatPopulation(population) {
+    // Handle both string and number formats
+    if (typeof population === "string") {
+      // If it's already formatted (like "125,836,021"), return as is but convert to readable format
+      if (population.includes(",")) {
+        const num = parseInt(population.replace(/,/g, ""))
+        if (num >= 1000000) {
+          return `${(num / 1000000).toFixed(1)} million`
+        } else if (num >= 1000) {
+          return `${(num / 1000).toFixed(1)}k`
+        }
+        return population
+      }
+      return population
     }
+
+    if (typeof population === "number") {
+      if (population >= 1000000) {
+        return `${(population / 1000000).toFixed(1)} million`
+      } else if (population >= 1000) {
+        return `${(population / 1000).toFixed(1)}k`
+      }
+      return population.toString()
+    }
+
+    return population
   },
 
   handleDelete(card) {
@@ -305,19 +180,19 @@ export const countryModule = {
     console.log("Country card deleted")
   },
 
-  handleEdit(card) {
-    // In a real app, this would open an edit form
+  handleBookmark(card) {
+    // Simple demonstration - toggle bookmark state
+    const bookmarkButton = card.querySelector(".bookmark-button")
     const country = card.querySelector(".card-title").textContent
-    console.log(`Editing country card for ${country}`)
 
-    // Simple demonstration - add a new tag
-    const tagsContainer = card.querySelector(".tags-container")
-    const newTags = ["Favorite", "Must Visit", "Budget Friendly", "Family Friendly"]
-    const randomTag = newTags[Math.floor(Math.random() * newTags.length)]
-
-    const tagElement = document.createElement("span")
-    tagElement.className = "tag"
-    tagElement.textContent = randomTag
-    tagsContainer.appendChild(tagElement)
+    if (bookmarkButton.classList.contains("active")) {
+      bookmarkButton.classList.remove("active")
+      bookmarkButton.querySelector("i").classList.remove("active")
+      console.log(`Removed bookmark for ${country}`)
+    } else {
+      bookmarkButton.classList.add("active")
+      bookmarkButton.querySelector("i").classList.add("active")
+      console.log(`Bookmarked ${country}`)
+    }
   },
 }
